@@ -29336,11 +29336,12 @@ async function main() {
     if (!args.success) {
         throw new Error("Invalid arguments: " + args.error.errors.map(e => e.message).join("\n"));
     }
+    core.info(`Args: ${JSON.stringify(args)}`);
     const { root, paths, runtime } = args.data;
     // Change working directory
     process.chdir(path.resolve(root));
     // Run the command
-    const command = `npx braintrust eval ${paths} --root ${root} --runtime ${runtime}`;
+    const command = `npx braintrust eval ${paths}`;
     await exec(command);
 }
 async function run() {

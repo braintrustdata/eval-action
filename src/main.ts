@@ -29,13 +29,15 @@ async function main(): Promise<void> {
     );
   }
 
+  core.info(`Args: ${JSON.stringify(args)}`);
+
   const { root, paths, runtime } = args.data;
 
   // Change working directory
   process.chdir(path.resolve(root));
 
   // Run the command
-  const command = `npx braintrust eval ${paths} --root ${root} --runtime ${runtime}`;
+  const command = `npx braintrust eval ${paths}`;
   await exec(command);
 }
 
