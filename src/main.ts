@@ -1,5 +1,8 @@
 import * as core from '@actions/core'
 import { wait } from './wait'
+import z from 'zod'
+
+const params = z.strictObject({})
 
 /**
  * The main function for the action.
