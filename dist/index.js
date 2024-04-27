@@ -29339,6 +29339,8 @@ async function main() {
         throw new Error("Invalid arguments: " + args.error.errors.map(e => e.message).join("\n"));
     }
     const { api_key, root, paths, runtime } = args.data;
+    // Add the API key to the environment
+    core.exportVariable("BRAINTRUST_API_KEY", api_key);
     // Change working directory
     process.chdir(path.resolve(root));
     // Run the command

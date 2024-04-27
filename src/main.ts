@@ -33,6 +33,9 @@ async function main(): Promise<void> {
 
   const { api_key, root, paths, runtime } = args.data;
 
+  // Add the API key to the environment
+  core.exportVariable("BRAINTRUST_API_KEY", api_key);
+
   // Change working directory
   process.chdir(path.resolve(root));
 
