@@ -29330,6 +29330,7 @@ const params = zod_1.default.strictObject({
  */
 async function main() {
     const args = params.safeParse({
+        api_key: core.getInput("api_key"),
         root: core.getInput("root"),
         paths: core.getInput("paths"),
         runtime: core.getInput("runtime")

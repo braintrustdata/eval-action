@@ -20,6 +20,7 @@ const params = z.strictObject({
  */
 async function main(): Promise<void> {
   const args = params.safeParse({
+    api_key: core.getInput("api_key"),
     root: core.getInput("root"),
     paths: core.getInput("paths"),
     runtime: core.getInput("runtime")
