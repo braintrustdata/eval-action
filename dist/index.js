@@ -29314,6 +29314,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const zod_1 = __importDefault(__nccwpck_require__(3301));
+const util = __importStar(__nccwpck_require__(3837));
+const path = __importStar(__nccwpck_require__(1017));
+const child_process_1 = __nccwpck_require__(2081);
+const exec = util.promisify(child_process_1.exec);
 const params = zod_1.default.strictObject({
     root: zod_1.default.string(),
     paths: zod_1.default.string(),
@@ -29323,24 +29327,26 @@ const params = zod_1.default.strictObject({
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
+async function main() {
+    const args = params.safeParse({
+        root: core.getInput("root"),
+        paths: core.getInput("paths"),
+        runtime: core.getInput("runtime")
+    });
+    if (!args.success) {
+        throw new Error("Invalid arguments: " + args.error.errors.map(e => e.message).join("\n"));
+    }
+    const { root, paths, runtime } = args.data;
+    // Change working directory
+    process.chdir(path.resolve(root));
+    // Run the command
+    const command = `npx braintrust eval ${paths} --root ${root} --runtime ${runtime}`;
+    await exec(command);
+}
 async function run() {
-    try {
-        const argsP = params.safeParse({
-            root: core.getInput("root"),
-            paths: core.getInput("paths"),
-            runtime: core.getInput("runtime")
-        });
-        if (!argsP.success) {
-            throw new Error("Invalid arguments: " +
-                argsP.error.errors.map(e => e.message).join("\n"));
-        }
-        core.debug("Hello, world!");
-    }
-    catch (error) {
-        // Fail the workflow run if an error occurs
-        if (error instanceof Error)
-            core.setFailed(error.message);
-    }
+    return main().catch(error => {
+        core.setFailed(error.message);
+    });
 }
 exports.run = run;
 
@@ -29368,6 +29374,14 @@ module.exports = require("async_hooks");
 
 "use strict";
 module.exports = require("buffer");
+
+/***/ }),
+
+/***/ 2081:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
 
 /***/ }),
 
