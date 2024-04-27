@@ -2,8 +2,8 @@ name: Run evals
 
 on:
   push:
-    files:
-      - 'test-eval/**'
+    # files:
+    #   - 'test-eval/**'
 
 jobs:
   eval:
