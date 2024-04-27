@@ -1,8 +1,11 @@
-import * as core from '@actions/core'
-import { wait } from './wait'
-import z from 'zod'
+import * as core from "@actions/core";
+import z from "zod";
 
-const params = z.strictObject({})
+const params = z.strictObject({
+  root: z.string(),
+  paths: z.string(),
+  runtime: z.enum(["auto", "node", "python"])
+});
 
 /**
  * The main function for the action.
@@ -10,20 +13,21 @@ const params = z.strictObject({})
  */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const argsP = params.safeParse({
+      root: core.getInput("root"),
+      paths: core.getInput("paths"),
+      runtime: core.getInput("runtime")
+    });
+    if (!argsP.success) {
+      throw new Error(
+        "Invalid arguments: " +
+          argsP.error.errors.map(e => e.message).join("\n")
+      );
+    }
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
-
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    core.debug("Hello, world!");
   } catch (error) {
     // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message);
   }
 }
