@@ -24,7 +24,7 @@ jobs:
 
       - name: Install Dependencies
         id: install
-        run: npm ci
+        run: pnpm install
         working-directory: test-eval
 
       - name: Run Evals
