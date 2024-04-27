@@ -1,28 +1,31 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "The name of your action here"
+description: "Provide a description here"
+author: "Your name or organization here"
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'brain'
-  color: 'black'
+  icon: "brain"
+  color: "black"
 
 # Define your inputs here.
 inputs:
+  api_key:
+    description: "Your Braintrust API key"
+    required: true
   root:
-    description: 'Root directory from which to run evals'
+    description: "Root directory from which to run evals"
     required: false
-    default: '.'
+    default: "."
   paths:
-    description: 'A list of paths (and glob patterns) to include in the evals'
+    description: "A list of paths (and glob patterns) to include in the evals"
     required: false
-    default: '.'
+    default: "."
   runtime:
     description:
-      'The runtime to use for evals. By default, it will be derived from the
-      directory. Valid values are auto, node, and python.'
+      "The runtime to use for evals. By default, it will be derived from the
+      directory. Valid values are auto, node, and python."
     required: false
-    default: 'auto'
+    default: "auto"
 
 # Define your outputs here.
 # outputs:

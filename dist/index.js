@@ -29319,6 +29319,7 @@ const path = __importStar(__nccwpck_require__(1017));
 const child_process_1 = __nccwpck_require__(2081);
 const exec = util.promisify(child_process_1.exec);
 const params = zod_1.default.strictObject({
+    api_key: zod_1.default.string(),
     root: zod_1.default.string(),
     paths: zod_1.default.string(),
     runtime: zod_1.default.enum(["auto", "node", "python"])
@@ -29336,8 +29337,7 @@ async function main() {
     if (!args.success) {
         throw new Error("Invalid arguments: " + args.error.errors.map(e => e.message).join("\n"));
     }
-    core.info(`Args: ${JSON.stringify(args)}`);
-    const { root, paths, runtime } = args.data;
+    const { api_key, root, paths, runtime } = args.data;
     // Change working directory
     process.chdir(path.resolve(root));
     // Run the command

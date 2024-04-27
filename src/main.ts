@@ -8,6 +8,7 @@ import { exec as execSync } from "child_process";
 const exec = util.promisify(execSync);
 
 const params = z.strictObject({
+  api_key: z.string(),
   root: z.string(),
   paths: z.string(),
   runtime: z.enum(["auto", "node", "python"])
@@ -29,9 +30,7 @@ async function main(): Promise<void> {
     );
   }
 
-  core.info(`Args: ${JSON.stringify(args)}`);
-
-  const { root, paths, runtime } = args.data;
+  const { api_key, root, paths, runtime } = args.data;
 
   // Change working directory
   process.chdir(path.resolve(root));

@@ -37,4 +37,5 @@ jobs:
         id: eval
         uses: ./
         with:
+          api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           root: test-eval
