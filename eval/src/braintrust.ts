@@ -11,7 +11,27 @@ import { ExperimentSummary } from "braintrust";
 
 import REPORTER from "./reporter.txt";
 
-const exec = util.promisify(execSync);
+function runCommand(command: string) {
+  return new Promise((resolve, reject) => {
+    const process = execSync(command);
+
+    process.stdout?.on("data", data => {
+      core.info(data); // Outputs the stdout of the command
+    });
+
+    process.stderr?.on("data", data => {
+      core.error(data); // Outputs the stderr of the command
+    });
+
+    process.on("close", code => {
+      if (code === 0) {
+        resolve(null);
+      } else {
+        reject(`Command failed with exit code ${code}`);
+      }
+    });
+  });
+}
 
 export interface SummaryInfo {
   evaluator: {
@@ -45,7 +65,7 @@ export async function runEval(args: Params) {
 
   const command = `npx braintrust eval ${paths} ${reporterFile}`;
   core.info(`Running command: ${command}`);
-  await exec(command);
+  await runCommand(command);
 
   // Read the summary files
   const summaryFiles = await fsp.readdir(reportersDir);
