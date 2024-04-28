@@ -14,6 +14,8 @@ const paramsSchema = z.strictObject({
 });
 export type Params = z.infer<typeof paramsSchema>;
 
+const TITLE = "## Braintrust eval report\n";
+
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -34,7 +36,7 @@ async function main(): Promise<void> {
     throw new Error("Only Node.js runtime is supported");
   }
 
-  await upsertComment("Evals in progress... ⌛");
+  await upsertComment(`${TITLE}Evals in progress... ⌛`);
 
   try {
     await runEval(args.data, onSummary);
@@ -68,7 +70,7 @@ async function updateComments(mustRun: boolean) {
   currentUpdate = (async () => {
     while (queuedUpdates > 0) {
       await upsertComment(
-        "## Braintrust eval report\n" +
+        TITLE +
           allSummaries
             .map((summary: ExperimentSummary | ExperimentFailure, idx) => {
               // As a somewhat ridiculous hack, we know that we _first_ print errors, and then the summary,
