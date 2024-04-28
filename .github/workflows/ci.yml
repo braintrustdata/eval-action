@@ -47,22 +47,22 @@ jobs:
       - name: Install Dependencies
         id: install
         run: pnpm install
-        working-directory: test-eval
+        working-directory: eval
 
       - name: Check Format
         id: npm-format-check
         run: npm run format:check
-        working-directory: test-eval
+        working-directory: eval
 
       - name: Lint
         id: npm-lint
         run: npm run lint
-        working-directory: test-eval
+        working-directory: eval
 
       - name: Test
         id: npm-ci-test
         run: npm run ci-test
-        working-directory: test-eval
+        working-directory: eval
 
   test-action:
     name: GitHub Actions Test
