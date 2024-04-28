@@ -5,6 +5,8 @@ import * as util from "util";
 import * as path from "path";
 import { exec as execSync } from "child_process";
 
+import { upsertComment } from "./comment";
+
 const exec = util.promisify(execSync);
 
 const params = z.strictObject({
@@ -35,6 +37,9 @@ async function main(): Promise<void> {
 
   // Add the API key to the environment
   core.exportVariable("BRAINTRUST_API_KEY", api_key);
+  if (!process.env.OPENAI_API_KEY) {
+    core.exportVariable("OPENAI_API_KEY", api_key);
+  }
 
   // Change working directory
   process.chdir(path.resolve(root));
@@ -42,6 +47,8 @@ async function main(): Promise<void> {
   // Run the command
   const command = `npx braintrust eval ${paths}`;
   await exec(command);
+
+  await upsertComment();
 }
 
 export async function run(): Promise<void> {

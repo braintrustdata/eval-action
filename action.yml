@@ -12,6 +12,9 @@ inputs:
   api_key:
     description: "Your Braintrust API key"
     required: true
+  github_token:
+    description: "Your GitHub token"
+    required: true
   root:
     description: "Root directory from which to run evals"
     required: false

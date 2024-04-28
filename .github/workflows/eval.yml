@@ -38,4 +38,5 @@ jobs:
         uses: ./
         with:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           root: test-eval
