@@ -33556,6 +33556,7 @@ exports.NEVER = parseUtil_1.INVALID;
 
 "use strict";
 
+// This code is partially derived from https://github.com/int128/comment-action/blob/main/src/comment.ts
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -33586,24 +33587,44 @@ const github = __importStar(__nccwpck_require__(5438));
 async function upsertComment() {
     const githubToken = core.getInput("github_token", { required: true });
     const octokit = github.getOctokit(githubToken);
-    const context = github.context;
-    core.info(`Context: ${JSON.stringify(context, null, 2)}`);
-    if (context.payload.pull_request == null) {
-        throw new Error("No pull request found.");
-    }
-    const prNumber = context.payload.pull_request.number;
-    const owner = context.repo.owner;
-    const repo = context.repo.repo;
+    const prs = await inferPullRequestsFromContext(octokit);
     const commentBody = `<!-- braintrust_bot_comment -->
 Thank you for your pull request!`;
-    const response = await octokit.rest.issues.createComment({
-        owner,
-        repo,
-        issue_number: prNumber,
-        body: commentBody
-    });
+    for (const pr of prs) {
+        const response = await octokit.rest.issues.createComment({
+            ...pr,
+            body: commentBody
+        });
+    }
 }
 exports.upsertComment = upsertComment;
+const inferPullRequestsFromContext = async (octokit) => {
+    const { context } = github;
+    if (Number.isSafeInteger(context.issue.number)) {
+        core.info(`Use #${context.issue.number} from the current context`);
+        return [
+            {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number
+            }
+        ];
+    }
+    core.info(`List pull requests associated with sha ${context.sha}`);
+    const pulls = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        commit_sha: context.sha
+    });
+    for (const pull of pulls.data) {
+        core.info(`  #${pull.number}: ${pull.title}`);
+    }
+    return pulls.data.map(p => ({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        issue_number: p.number
+    }));
+};
 
 
 /***/ }),
