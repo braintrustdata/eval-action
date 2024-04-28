@@ -66,7 +66,7 @@ const findComment = async (
     direction: "desc",
     per_page: 100,
   });
-  core.info(
+  core.debug(
     `Found ${comments.length} comment(s) of #${pullRequest.issue_number}`,
   );
   for (const comment of comments) {
@@ -80,9 +80,8 @@ const inferPullRequestsFromContext = async (
   octokit: Octokit,
 ): Promise<PullRequest[]> => {
   const { context } = github;
-  core.info(`Current context: ${JSON.stringify(context, null, 2)}`);
   if (Number.isSafeInteger(context.issue.number)) {
-    core.info(`Use #${context.issue.number} from the current context`);
+    core.debug(`Use #${context.issue.number} from the current context`);
     return [
       {
         owner: context.repo.owner,
@@ -92,14 +91,14 @@ const inferPullRequestsFromContext = async (
     ];
   }
 
-  core.info(`List pull requests associated with sha ${context.sha}`);
+  core.debug(`List pull requests associated with sha ${context.sha}`);
   const pulls = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
     owner: context.repo.owner,
     repo: context.repo.repo,
     commit_sha: context.sha,
   });
   for (const pull of pulls.data) {
-    core.info(`  #${pull.number}: ${pull.title}`);
+    core.debug(`  #${pull.number}: ${pull.title}`);
   }
   return pulls.data.map(p => ({
     owner: context.repo.owner,
