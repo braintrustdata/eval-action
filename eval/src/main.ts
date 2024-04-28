@@ -69,97 +69,106 @@ async function updateComments(mustRun: boolean) {
   currentUpdate = (async () => {
     while (queuedUpdates > 0) {
       await upsertComment(
-        allSummaries
-          .map((summary: ExperimentSummary | ExperimentFailure, idx) => {
-            // As a somewhat ridiculous hack, we know that we _first_ print errors, and then the summary,
-            // for experiments that fail.
-            if (idx > 0 && "errors" in allSummaries[idx - 1]) {
-              return "";
-            }
-            if ("errors" in summary) {
-              let prefix = "**‼️** ";
-              if (
-                idx < allSummaries.length - 1 &&
-                !("errors" in allSummaries[idx + 1])
-              ) {
-                prefix += formatSummary(
-                  allSummaries[idx + 1] as ExperimentSummary,
-                );
-              } else {
-                prefix += `**${summary.evaluatorName} failed to run**`;
+        "## Braintrust eval report\n" +
+          allSummaries
+            .map((summary: ExperimentSummary | ExperimentFailure, idx) => {
+              // As a somewhat ridiculous hack, we know that we _first_ print errors, and then the summary,
+              // for experiments that fail.
+              if (idx > 0 && "errors" in allSummaries[idx - 1]) {
+                return "";
               }
-              const errors = "```\n" + summary.errors.join("\n") + "\n```";
-              return (
-                prefix +
-                "\n" +
-                `<details>
+              if ("errors" in summary) {
+                let prefix = "**‼️** ";
+                if (
+                  idx < allSummaries.length - 1 &&
+                  !("errors" in allSummaries[idx + 1])
+                ) {
+                  prefix += formatSummary(
+                    allSummaries[idx + 1] as ExperimentSummary,
+                  );
+                } else {
+                  prefix += `**${summary.evaluatorName} failed to run**`;
+                }
+                const errors = "```\n" + summary.errors.join("\n") + "\n```";
+                return (
+                  prefix +
+                  "\n" +
+                  `<details>
 <summary>Expand to see errors</summary>
 
 ${errors}              
 
 </details>`
-              );
-            }
-            const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
-            const columns = ["Score", "Average", "Improvements", "Regressions"];
-            const header = columns.join(" | ");
-            const separator = columns.map(() => "---").join(" | ");
+                );
+              }
+              const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
+              const columns = [
+                "Score",
+                "Average",
+                "Improvements",
+                "Regressions",
+              ];
+              const header = columns.join(" | ");
+              const separator = columns.map(() => "---").join(" | ");
 
-            const rowData = Object.entries(summary.scores)
-              .map(([name, summary]) => {
-                let diffText = "";
-                if (summary.diff !== undefined) {
-                  const diffN = round(summary.diff, 2) * 100;
-                  diffText =
-                    " " + (summary.diff > 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
-                }
-
-                return {
-                  name,
-                  avg: `${round(summary.score, 2)}${diffText}`,
-                  improvements: summary.improvements,
-                  regressions: summary.regressions,
-                };
-              })
-              .concat(
-                Object.entries(summary.metrics ?? {}).map(([name, summary]) => {
+              const rowData = Object.entries(summary.scores)
+                .map(([name, summary]) => {
                   let diffText = "";
                   if (summary.diff !== undefined) {
-                    const diffN = round(summary.diff, 2);
+                    const diffN = round(summary.diff, 2) * 100;
                     diffText =
                       " " +
-                      (summary.diff > 0
-                        ? `(+${diffN}${summary.unit})`
-                        : `(${diffN}${summary.unit})`);
+                      (summary.diff > 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
                   }
+
                   return {
                     name,
-                    avg: `${round(summary.metric, 2)}${summary.unit}${diffText}`,
+                    avg: `${round(summary.score, 2)}${diffText}`,
                     improvements: summary.improvements,
                     regressions: summary.regressions,
                   };
-                }),
-              );
+                })
+                .concat(
+                  Object.entries(summary.metrics ?? {}).map(
+                    ([name, summary]) => {
+                      let diffText = "";
+                      if (summary.diff !== undefined) {
+                        const diffN = round(summary.diff, 2);
+                        diffText =
+                          " " +
+                          (summary.diff > 0
+                            ? `(+${diffN}${summary.unit})`
+                            : `(${diffN}${summary.unit})`);
+                      }
+                      return {
+                        name,
+                        avg: `${round(summary.metric, 2)}${summary.unit}${diffText}`,
+                        improvements: summary.improvements,
+                        regressions: summary.regressions,
+                      };
+                    },
+                  ),
+                );
 
-            const rows = rowData.map(
-              ({ name, avg, improvements, regressions }) =>
-                `${capitalize(name)} | ${avg} | ${
-                  improvements !== undefined && improvements > 0
-                    ? `🟢 ${improvements}`
-                    : improvements === 0
-                      ? `🟡 0`
-                      : `-`
-                } | ${
-                  regressions !== undefined && regressions > 0
-                    ? `🔴 ${regressions}`
-                    : regressions === 0
-                      ? `🟢 0`
-                      : `-`
-                }`,
-            );
-            return `## Braintrust eval report\n${text}\n${header}\n${separator}\n${rows.join("\n")}`;
-          })
-          .join("\n\n"),
+              const rows = rowData.map(
+                ({ name, avg, improvements, regressions }) =>
+                  `${capitalize(name)} | ${avg} | ${
+                    improvements !== undefined && improvements > 0
+                      ? `🟢 ${improvements}`
+                      : improvements === 0
+                        ? `🟡 0`
+                        : `-`
+                  } | ${
+                    regressions !== undefined && regressions > 0
+                      ? `🔴 ${regressions}`
+                      : regressions === 0
+                        ? `🟢 0`
+                        : `-`
+                  }`,
+              );
+              return `${text}\n${header}\n${separator}\n${rows.join("\n")}`;
+            })
+            .join("\n\n"),
       );
       queuedUpdates -= 1;
     }
