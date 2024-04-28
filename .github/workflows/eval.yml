@@ -53,6 +53,7 @@ jobs:
       - name: Run Evals
         uses: ./
         with:
+          api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           root: test-eval
           runtime: node
 

@@ -12,7 +12,6 @@ inputs:
   api_key:
     description: "Your Braintrust API key"
     required: true
-    default: ${{ secrets.BRAINTRUST_API_KEY }}
   root:
     description: "Root directory from which to run evals"
     required: false
