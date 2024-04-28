@@ -55,6 +55,7 @@ function runUpdateComments() {
 
 let queuedUpdates = 0;
 async function updateComments() {
+  core.info(`QUEUED UPDATES ${queuedUpdates}`);
   if (queuedUpdates > 1) {
     return;
   }
