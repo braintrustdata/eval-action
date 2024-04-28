@@ -38,4 +38,4 @@ inputs:
 
 runs:
   using: node20
-  main: dist/index.js
+  main: eval/dist/index.js
