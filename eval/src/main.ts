@@ -58,6 +58,7 @@ async function updateComments() {
   if (queuedUpdates > 1) {
     return;
   }
+  core.info(`NUM SUMMARIES ${allSummaries.length}`);
 
   await upsertComment(
     allSummaries

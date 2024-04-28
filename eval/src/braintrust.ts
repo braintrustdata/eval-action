@@ -20,7 +20,6 @@ function runCommand(command: string, onSummary: OnSummaryFn) {
           .filter(line => line.length > 0)
           .flatMap(line => {
             try {
-              core.info("parsing " + line);
               return [JSON.parse(line)];
             } catch (e) {
               core.error(`Failed to parse jsonl data: ${e}`);
