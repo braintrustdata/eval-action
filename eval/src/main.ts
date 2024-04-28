@@ -35,7 +35,7 @@ async function main(): Promise<void> {
     throw new Error("Only Node.js runtime is supported");
   }
 
-  await upsertComment("Evals in progress...");
+  await upsertComment("Evals in progress... ⌛");
 
   try {
     await runEval(args.data, onSummary);
@@ -157,7 +157,7 @@ ${errors}
                       : `-`
                 }`,
             );
-            return `${text}\n${header}\n${separator}\n${rows.join("\n")}`;
+            return `## Braintrust eval report\n${text}\n${header}\n${separator}\n${rows.join("\n")}`;
           })
           .join("\n\n"),
       );
