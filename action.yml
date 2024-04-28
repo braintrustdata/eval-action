@@ -34,7 +34,7 @@ inputs:
     description:
       "The run ID to uniquely identify this run (you should not set this)"
     required: true
-    default: ${{ github.run_id }}
+    default: ${{ github.action }}
 
 # Define your outputs here.
 # outputs:
