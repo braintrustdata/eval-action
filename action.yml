@@ -15,6 +15,7 @@ inputs:
   github_token:
     description: "Your GitHub token"
     required: true
+    default: ${{ github.token }}
   root:
     description: "Root directory from which to run evals"
     required: false
