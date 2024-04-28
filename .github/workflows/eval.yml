@@ -5,6 +5,9 @@ on:
     # files:
     #   - 'test-eval/**'
 
+permissions:
+  pull-requests: read
+
 jobs:
   eval:
     name: Run evals
