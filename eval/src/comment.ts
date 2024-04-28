@@ -29,7 +29,7 @@ const createOrUpdateComment = async (
   const commentKey = `<!-- braintrust_bot_comment ${stepKey} -->`;
   const comment = await findComment(octokit, pullRequest, commentKey);
   if (!comment) {
-    const { data: created } = await octokit.rest.issues.createComment({
+    await octokit.rest.issues.createComment({
       owner: pullRequest.owner,
       repo: pullRequest.repo,
       issue_number: pullRequest.issue_number,

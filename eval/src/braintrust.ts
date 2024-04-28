@@ -1,6 +1,5 @@
 import path from "path";
 import * as core from "@actions/core";
-import * as process from "process";
 import { exec as execSync } from "child_process";
 
 import { Params } from "./main";
@@ -13,7 +12,7 @@ export interface ExperimentFailure {
 
 type OnSummaryFn = (summary: (ExperimentSummary | ExperimentFailure)[]) => void;
 
-function runCommand(command: string, onSummary: OnSummaryFn) {
+async function runCommand(command: string, onSummary: OnSummaryFn) {
   return new Promise((resolve, reject) => {
     const process = execSync(command);
 
@@ -44,7 +43,7 @@ function runCommand(command: string, onSummary: OnSummaryFn) {
       if (code === 0) {
         resolve(null);
       } else {
-        reject(`Command failed with exit code ${code}`);
+        reject(new Error(`Command failed with exit code ${code}`));
       }
     });
   });

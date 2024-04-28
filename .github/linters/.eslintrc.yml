@@ -20,7 +20,7 @@ parserOptions:
   ecmaVersion: 2023
   sourceType: module
   project:
-    - './.github/linters/tsconfig.json'
+    - '../.github/linters/tsconfig.json'
     - './tsconfig.json'
 
 plugins:
@@ -44,7 +44,6 @@ rules:
     'no-console': 'off',
     'no-unused-vars': 'off',
     'prettier/prettier': 'error',
-    'semi': 'off',
     '@typescript-eslint/array-type': 'error',
     '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/ban-ts-comment': 'error',
@@ -76,7 +75,6 @@ rules:
     '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/require-array-sort-compare': 'error',
     '@typescript-eslint/restrict-plus-operands': 'error',
-    '@typescript-eslint/semi': ['error', 'never'],
     '@typescript-eslint/space-before-function-paren': 'off',
     '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/unbound-method': 'error'

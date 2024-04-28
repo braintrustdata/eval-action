@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import z from "zod";
-import * as github from "@actions/github";
 
 import { upsertComment } from "./comment";
 import { ExperimentFailure, runEval } from "./braintrust";
@@ -28,7 +27,7 @@ async function main(): Promise<void> {
   });
   if (!args.success) {
     throw new Error(
-      "Invalid arguments: " + args.error.errors.map(e => e.message).join("\n"),
+      `Invalid arguments: ${args.error.errors.map(e => e.message).join("\n")}`,
     );
   }
   if (args.data.runtime !== "node") {
@@ -101,72 +100,7 @@ ${errors}
 </details>`
                 );
               }
-              const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
-              const columns = [
-                "Score",
-                "Average",
-                "Improvements",
-                "Regressions",
-              ];
-              const header = columns.join(" | ");
-              const separator = columns.map(() => "---").join(" | ");
-
-              const rowData = Object.entries(summary.scores)
-                .map(([name, summary]) => {
-                  let diffText = "";
-                  if (summary.diff !== undefined) {
-                    const diffN = round(summary.diff, 2) * 100;
-                    diffText =
-                      " " +
-                      (summary.diff > 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
-                  }
-
-                  return {
-                    name,
-                    avg: `${round(summary.score, 2)}${diffText}`,
-                    improvements: summary.improvements,
-                    regressions: summary.regressions,
-                  };
-                })
-                .concat(
-                  Object.entries(summary.metrics ?? {}).map(
-                    ([name, summary]) => {
-                      let diffText = "";
-                      if (summary.diff !== undefined) {
-                        const diffN = round(summary.diff, 2);
-                        diffText =
-                          " " +
-                          (summary.diff > 0
-                            ? `(+${diffN}${summary.unit})`
-                            : `(${diffN}${summary.unit})`);
-                      }
-                      return {
-                        name,
-                        avg: `${round(summary.metric, 2)}${summary.unit}${diffText}`,
-                        improvements: summary.improvements,
-                        regressions: summary.regressions,
-                      };
-                    },
-                  ),
-                );
-
-              const rows = rowData.map(
-                ({ name, avg, improvements, regressions }) =>
-                  `${capitalize(name)} | ${avg} | ${
-                    improvements !== undefined && improvements > 0
-                      ? `🟢 ${improvements}`
-                      : improvements === 0
-                        ? `🟡 0`
-                        : `-`
-                  } | ${
-                    regressions !== undefined && regressions > 0
-                      ? `🔴 ${regressions}`
-                      : regressions === 0
-                        ? `🟢 0`
-                        : `-`
-                  }`,
-              );
-              return `${text}\n${header}\n${separator}\n${rows.join("\n")}`;
+              return formatSummary(summary);
             })
             .join("\n\n"),
       );
@@ -183,36 +117,37 @@ function formatSummary(summary: ExperimentSummary) {
   const separator = columns.map(() => "---").join(" | ");
 
   const rowData = Object.entries(summary.scores)
-    .map(([name, summary]) => {
+    .map(([name, scoreSummary]) => {
       let diffText = "";
-      if (summary.diff !== undefined) {
-        const diffN = round(summary.diff, 2) * 100;
-        diffText = " " + (summary.diff > 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
+      if (scoreSummary.diff !== undefined) {
+        const diffN = round(scoreSummary.diff, 2) * 100;
+        diffText =
+          " " + (scoreSummary.diff > 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
       }
 
       return {
         name,
-        avg: `${round(summary.score, 2)}${diffText}`,
-        improvements: summary.improvements,
-        regressions: summary.regressions,
+        avg: `${round(scoreSummary.score, 2)}${diffText}`,
+        improvements: scoreSummary.improvements,
+        regressions: scoreSummary.regressions,
       };
     })
     .concat(
-      Object.entries(summary.metrics ?? {}).map(([name, summary]) => {
+      Object.entries(summary.metrics ?? {}).map(([name, metricSummary]) => {
         let diffText = "";
-        if (summary.diff !== undefined) {
-          const diffN = round(summary.diff, 2);
+        if (metricSummary.diff !== undefined) {
+          const diffN = round(metricSummary.diff, 2);
           diffText =
             " " +
-            (summary.diff > 0
-              ? `(+${diffN}${summary.unit})`
-              : `(${diffN}${summary.unit})`);
+            (metricSummary.diff > 0
+              ? `(+${diffN}${metricSummary.unit})`
+              : `(${diffN}${metricSummary.unit})`);
         }
         return {
           name,
-          avg: `${round(summary.metric, 2)}${summary.unit}${diffText}`,
-          improvements: summary.improvements,
-          regressions: summary.regressions,
+          avg: `${round(metricSummary.metric, 2)}${metricSummary.unit}${diffText}`,
+          improvements: metricSummary.improvements,
+          regressions: metricSummary.regressions,
         };
       }),
     );
@@ -241,7 +176,9 @@ function round(n: number, decimals: number) {
 }
 
 export async function run(): Promise<void> {
-  return main().catch(error => {
-    core.setFailed(error.message);
-  });
+  try {
+    await main();
+  } catch (error) {
+    core.setFailed(`${error}`);
+  }
 }
