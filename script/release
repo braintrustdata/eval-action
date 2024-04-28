@@ -53,6 +53,11 @@ fi
 git tag -a "$new_tag" -m "$new_tag Release"
 echo -e "${GREEN}Tagged: $new_tag${OFF}"
 
+# Tag the first part of the version
+tag_first_part=$(echo "$new_tag" | cut -d. -f1)
+git tag -a "$tag_first_part" -m "$tag_first_part Release" -f
+echo -e "${GREEN}Tagged: $tag_first_part${OFF}"
+
 # Push the new tag to the remote
 git push --tags
 echo -e "${GREEN}Release tag pushed to remote${OFF}"
