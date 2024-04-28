@@ -33588,7 +33588,7 @@ async function upsertComment() {
     const githubToken = core.getInput("github_token");
     const octokit = github.getOctokit(githubToken);
     const prs = await inferPullRequestsFromContext(octokit);
-    const commentBody = `Thank you for your pull request x3!`;
+    const commentBody = `Thank you for your pull request x4!`;
     await Promise.all(prs.map(pr => createOrUpdateComment(octokit, pr, commentBody)));
 }
 exports.upsertComment = upsertComment;
