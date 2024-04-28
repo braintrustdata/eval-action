@@ -17,8 +17,7 @@ export async function upsertComment() {
 
   const prs = await inferPullRequestsFromContext(octokit);
 
-  const commentBody = `<!-- braintrust_bot_comment -->
-Thank you for your pull request!`;
+  const commentBody = `Thank you for your pull request x2!`;
 
   await Promise.all(
     prs.map(pr => createOrUpdateComment(octokit, pr, commentBody))
