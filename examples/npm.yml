@@ -2,6 +2,9 @@ name: Run npm evals
 
 on:
   push:
+    # Uncomment to run only when files in the 'evals' directory change
+    # - paths:
+    #     - "evals/**"
 
 permissions:
   pull-requests: write
