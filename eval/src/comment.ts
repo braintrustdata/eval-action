@@ -79,7 +79,7 @@ const inferPullRequestsFromContext = async (
   octokit: Octokit,
 ): Promise<PullRequest[]> => {
   const { context } = github;
-  // core.info(`Current context: ${JSON.stringify(context, null, 2)}`);
+  core.info(`Current context: ${JSON.stringify(context, null, 2)}`);
   if (Number.isSafeInteger(context.issue.number)) {
     core.info(`Use #${context.issue.number} from the current context`);
     return [

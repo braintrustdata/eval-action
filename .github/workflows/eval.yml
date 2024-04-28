@@ -51,7 +51,6 @@ jobs:
         working-directory: test-eval
 
       - name: Run Evals
-        id: eval
         uses: ./
         with:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
