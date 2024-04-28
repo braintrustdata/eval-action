@@ -34,7 +34,10 @@ jobs:
       - name: Install Dependencies
         id: install
         run: pnpm install
-        working-directory: test-eval
+
+      - name: Build Dependencies
+        id: install
+        run: pnpm build
 
       - name: Run Evals
         id: eval
