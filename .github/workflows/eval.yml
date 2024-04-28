@@ -50,11 +50,6 @@ jobs:
         run: pnpm install
         working-directory: test-eval
 
-      - name: Build Dependencies
-        id: build
-        run: pnpm build
-        working-directory: test-eval
-
       - name: Run Evals
         id: eval
         uses: ./
