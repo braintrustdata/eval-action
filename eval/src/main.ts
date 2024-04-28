@@ -73,7 +73,7 @@ async function updateComments(mustRun: boolean) {
               return "";
             }
             if ("errors" in summary) {
-              let prefix = "**‼** ";
+              let prefix = "**‼️** ";
               if (
                 idx < allSummaries.length - 1 &&
                 !("errors" in allSummaries[idx + 1])
@@ -84,7 +84,7 @@ async function updateComments(mustRun: boolean) {
               } else {
                 prefix += `**${summary.evaluatorName} failed to run**`;
               }
-              const errors = "```" + summary.errors.join("\n") + "```";
+              const errors = "```\n" + summary.errors.join("\n") + "\n```";
               return (
                 prefix +
                 "\n" +
@@ -197,6 +197,10 @@ function formatSummary(summary: ExperimentSummary) {
         };
       }),
     );
+
+  if (rowData.length === 0) {
+    return text;
+  }
 
   const rows = rowData.map(
     ({ name, avg, improvements, regressions }) =>
