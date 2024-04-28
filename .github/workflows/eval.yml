@@ -24,6 +24,11 @@ jobs:
           node-version-file: .node-version
           cache: npm
 
+      - uses: int128/comment-action@v1
+        with:
+          post: |
+            :wave: Hello World
+
       - uses: pnpm/action-setup@v3
         with:
           version: 8
