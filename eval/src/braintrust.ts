@@ -2,7 +2,7 @@ import fs from "fs";
 import fsp from "fs/promises";
 import path from "path";
 import * as core from "@actions/core";
-import * as util from "util";
+import * as process from "process";
 import * as os from "os";
 import { exec as execSync } from "child_process";
 
@@ -65,6 +65,7 @@ export async function runEval(args: Params) {
 
   const command = `npx braintrust eval ${paths} ${reporterFile}`;
   core.info(`Running command: ${command}`);
+  core.info("Current directory:" + process.cwd());
   await runCommand(command);
 
   // Read the summary files
