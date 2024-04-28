@@ -8,7 +8,7 @@ on:
 permissions:
   pull-requests: read
   contents: read
-  id-token: read
+  id_token: read
 
 jobs:
   eval:
