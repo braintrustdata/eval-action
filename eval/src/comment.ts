@@ -25,10 +25,11 @@ const createOrUpdateComment = async (
   pullRequest: PullRequest,
   body: string,
 ) => {
-  const commentKey = `<!-- braintrust_bot_comment -->`;
+  const stepKey = core.getInput("step_key", { required: true });
+  const commentKey = `<!-- braintrust_bot_comment ${stepKey} -->`;
   const comment = await findComment(octokit, pullRequest, commentKey);
   if (!comment) {
-    const { data: created } = await octokit.rest.issues.createComment({
+    await octokit.rest.issues.createComment({
       owner: pullRequest.owner,
       repo: pullRequest.repo,
       issue_number: pullRequest.issue_number,
@@ -79,7 +80,7 @@ const inferPullRequestsFromContext = async (
   octokit: Octokit,
 ): Promise<PullRequest[]> => {
   const { context } = github;
-  // core.info(`Current context: ${JSON.stringify(context, null, 2)}`);
+  core.info(`Current context: ${JSON.stringify(context, null, 2)}`);
   if (Number.isSafeInteger(context.issue.number)) {
     core.info(`Use #${context.issue.number} from the current context`);
     return [

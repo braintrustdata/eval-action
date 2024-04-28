@@ -1,3 +1,4 @@
+// Rename to fail.eval.ts to test failure reporting
 import { traced, Eval } from "braintrust";
 
 Eval("My Fail", {

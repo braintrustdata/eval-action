@@ -29,7 +29,7 @@
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
     "format:write": "npx prettier --write .",
     "format:check": "npx prettier --check .",
-    "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
+    "lint": "npx eslint .",
     "watch": "npm run package:watch",
     "package": "esbuild --platform=node --bundle src/index.ts  --outfile=dist/index.js --minify --sourcemap --target=es2020 --loader:.txt=text",
     "package:watch": "npm run package -- --watch",
@@ -69,8 +69,8 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",
-    "@braintrust/core": "workspace:*",
-    "braintrust": "workspace:*",
+    "@braintrust/core": "^0.0.34",
+    "braintrust": "^0.0.124",
     "zod": "^3.23.4"
   },
   "devDependencies": {

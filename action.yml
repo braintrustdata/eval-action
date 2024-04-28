@@ -12,10 +12,6 @@ inputs:
   api_key:
     description: "Your Braintrust API key"
     required: true
-  github_token:
-    description: "Your GitHub token"
-    required: true
-    default: ${{ github.token }}
   root:
     description: "Root directory from which to run evals"
     required: false
@@ -25,11 +21,18 @@ inputs:
     required: false
     default: "."
   runtime:
+    description: "The runtime to use for evals. Valid values: node, python."
+    required: true
+  github_token:
+    description: "Your GitHub token"
+    required: true
+    default: ${{ github.token }}
+  step_key:
     description:
-      "The runtime to use for evals. By default, it will be derived from the
-      directory. Valid values are auto, node, and python."
-    required: false
-    default: "auto"
+      "A unique key to identify this step. Do not change this unless you know
+      what you're doing."
+    required: true
+    default: ${{ github.workflow_ref }}-${{ github.action }}
 
 # Define your outputs here.
 # outputs:

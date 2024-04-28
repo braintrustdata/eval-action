@@ -55,6 +55,7 @@ jobs:
         with:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           root: test-eval
+          runtime: node
 
       # - name: Start terminal session
       #   uses: mxschmitt/action-tmate@v3

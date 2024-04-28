@@ -1,0 +1,54 @@
+env:
+  node: true
+  es6: true
+  jest: true
+
+globals:
+  Atomics: readonly
+  SharedArrayBuffer: readonly
+
+ignorePatterns:
+  - "!.*"
+  - "**/node_modules/.*"
+  - "**/dist/**"
+  - "**/coverage/.*"
+  - "*.json"
+
+parser: "@typescript-eslint/parser"
+
+plugins:
+  - jest
+  - "@typescript-eslint"
+
+extends:
+  - eslint:recommended
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:github/recommended
+  - plugin:jest/recommended
+
+rules:
+  {
+    "camelcase": "off",
+    "i18n-text/no-en": "off",
+    "import/no-namespace": "off",
+    "@next/next/no-img-element": "off",
+    "prefer-template": "off",
+    "@typescript-eslint/no-unused-vars":
+      [
+        "error",
+        {
+          vars: "all",
+          args: "none",
+          ignoreRestSiblings: false,
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+    "prefer-const": "error",
+    "tailwindcss/no-custom-classname": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-var-requires": "off",
+  }
