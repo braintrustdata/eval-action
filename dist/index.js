@@ -33585,7 +33585,7 @@ exports.upsertComment = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 async function upsertComment() {
-    const githubToken = core.getInput("github_token", { required: true });
+    const githubToken = core.getInput("github_token");
     const octokit = github.getOctokit(githubToken);
     const prs = await inferPullRequestsFromContext(octokit);
     const commentBody = `<!-- braintrust_bot_comment -->
