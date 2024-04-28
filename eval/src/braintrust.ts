@@ -20,7 +20,7 @@ function runCommand(command: string) {
     });
 
     process.stderr?.on("data", data => {
-      core.error(data); // Outputs the stderr of the command
+      core.info(data); // Outputs the stderr of the command
     });
 
     process.on("close", code => {
@@ -50,24 +50,13 @@ export async function runEval(args: Params) {
     core.exportVariable("OPENAI_API_KEY", api_key);
   }
 
-  // Make a temporary directory for reporters to leave their results
-  const tmpdir = os.tmpdir();
-  const reportersDir = path.join(tmpdir, "reporters");
-  await fsp.mkdir(reportersDir, { recursive: true });
-
-  core.exportVariable("BRAINTRUST_REPORTERS_DIR", reportersDir);
-
-  const reporterFile = path.join(tmpdir, "action-reporter.eval.ts");
-  await fsp.writeFile(reporterFile, REPORTER);
-
   // Change working directory
   process.chdir(path.resolve(root));
 
-  const command = `npx braintrust eval ${paths} ${reporterFile}`;
-  core.info(`Running command: ${command}`);
-  core.info("Current directory:" + process.cwd());
+  const command = `npx braintrust eval --jsonl ${paths}`;
   await runCommand(command);
 
+  /*
   // Read the summary files
   const summaryFiles = await fsp.readdir(reportersDir);
   const summaries: SummaryInfo[] = await Promise.all(
@@ -79,6 +68,7 @@ export async function runEval(args: Params) {
       return summaryData;
     }),
   );
+  */
 
-  return summaries;
+  return [];
 }

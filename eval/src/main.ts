@@ -37,7 +37,6 @@ async function main(): Promise<void> {
 
 export async function run(): Promise<void> {
   return main().catch(error => {
-    // XXX
-    // core.setFailed(error.message);
+    core.setFailed(error.message);
   });
 }
