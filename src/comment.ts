@@ -32,14 +32,12 @@ const createOrUpdateComment = async (
   const commentKey = `<!-- braintrust_bot_comment -->`;
   const comment = await findComment(octokit, pullRequest, commentKey);
   if (!comment) {
-    core.debug(`Key not found in #${pullRequest.issue_number}`);
     const { data: created } = await octokit.rest.issues.createComment({
       owner: pullRequest.owner,
       repo: pullRequest.repo,
       issue_number: pullRequest.issue_number,
       body: `${body}\n${commentKey}`
     });
-    core.debug(`Created a comment ${created.html_url}`);
     return;
   }
 
@@ -49,7 +47,7 @@ const createOrUpdateComment = async (
     comment_id: comment.id,
     body
   });
-  core.debug(`Updated the comment ${updated.html_url}`);
+  core.info(`Updated the comment ${updated.html_url}`);
 };
 
 type Comment = {
