@@ -12,5 +12,8 @@
   "dependencies": {
     "autoevals": "^0.0.64",
     "braintrust": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7"
   }
 }

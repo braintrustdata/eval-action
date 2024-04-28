@@ -191,6 +191,10 @@ importers:
       braintrust:
         specifier: workspace:*
         version: link:../braintrust-sdk/js
+    devDependencies:
+      '@types/node':
+        specifier: ^20.12.7
+        version: 20.12.7
 
 packages:
 
