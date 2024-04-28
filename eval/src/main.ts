@@ -14,7 +14,7 @@ const params = z.strictObject({
   api_key: z.string(),
   root: z.string(),
   paths: z.string(),
-  runtime: z.enum(["auto", "node", "python"])
+  runtime: z.enum(["auto", "node", "python"]),
 });
 
 /**
@@ -26,11 +26,11 @@ async function main(): Promise<void> {
     api_key: core.getInput("api_key"),
     root: core.getInput("root"),
     paths: core.getInput("paths"),
-    runtime: core.getInput("runtime")
+    runtime: core.getInput("runtime"),
   });
   if (!args.success) {
     throw new Error(
-      "Invalid arguments: " + args.error.errors.map(e => e.message).join("\n")
+      "Invalid arguments: " + args.error.errors.map(e => e.message).join("\n"),
     );
   }
 
@@ -57,7 +57,7 @@ async function main(): Promise<void> {
     api_key,
     no_send_logs: false,
     no_progress_bars: false,
-    terminate_on_failure: false
+    terminate_on_failure: false,
   });
   // const command = `npx braintrust eval ${paths}`;
   // await exec(command);

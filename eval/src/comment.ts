@@ -20,14 +20,14 @@ export async function upsertComment() {
   const commentBody = `Thank you for your pull request x4!`;
 
   await Promise.all(
-    prs.map(pr => createOrUpdateComment(octokit, pr, commentBody))
+    prs.map(pr => createOrUpdateComment(octokit, pr, commentBody)),
   );
 }
 
 const createOrUpdateComment = async (
   octokit: Octokit,
   pullRequest: PullRequest,
-  body: string
+  body: string,
 ) => {
   const commentKey = `<!-- braintrust_bot_comment -->`;
   const comment = await findComment(octokit, pullRequest, commentKey);
@@ -36,7 +36,7 @@ const createOrUpdateComment = async (
       owner: pullRequest.owner,
       repo: pullRequest.repo,
       issue_number: pullRequest.issue_number,
-      body: `${body}\n${commentKey}`
+      body: `${body}\n${commentKey}`,
     });
     return;
   }
@@ -45,7 +45,7 @@ const createOrUpdateComment = async (
     owner: pullRequest.owner,
     repo: pullRequest.repo,
     comment_id: comment.id,
-    body
+    body,
   });
   core.info(`Updated the comment ${updated.html_url}`);
 };
@@ -59,7 +59,7 @@ type Comment = {
 const findComment = async (
   octokit: Octokit,
   pullRequest: PullRequest,
-  key: string
+  key: string,
 ): Promise<Comment | undefined> => {
   const { data: comments } = await octokit.rest.issues.listComments({
     owner: pullRequest.owner,
@@ -67,10 +67,10 @@ const findComment = async (
     issue_number: pullRequest.issue_number,
     sort: "created",
     direction: "desc",
-    per_page: 100
+    per_page: 100,
   });
   core.info(
-    `Found ${comments.length} comment(s) of #${pullRequest.issue_number}`
+    `Found ${comments.length} comment(s) of #${pullRequest.issue_number}`,
   );
   for (const comment of comments) {
     if (comment.body?.includes(key)) {
@@ -80,17 +80,18 @@ const findComment = async (
 };
 
 const inferPullRequestsFromContext = async (
-  octokit: Octokit
+  octokit: Octokit,
 ): Promise<PullRequest[]> => {
   const { context } = github;
+  core.info(`Current context: ${JSON.stringify(context, null, 2)}`);
   if (Number.isSafeInteger(context.issue.number)) {
     core.info(`Use #${context.issue.number} from the current context`);
     return [
       {
         owner: context.repo.owner,
         repo: context.repo.repo,
-        issue_number: context.issue.number
-      }
+        issue_number: context.issue.number,
+      },
     ];
   }
 
@@ -98,7 +99,7 @@ const inferPullRequestsFromContext = async (
   const pulls = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    commit_sha: context.sha
+    commit_sha: context.sha,
   });
   for (const pull of pulls.data) {
     core.info(`  #${pull.number}: ${pull.title}`);
@@ -106,6 +107,6 @@ const inferPullRequestsFromContext = async (
   return pulls.data.map(p => ({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    issue_number: p.number
+    issue_number: p.number,
   }));
 };
