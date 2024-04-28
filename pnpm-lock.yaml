@@ -125,11 +125,11 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       '@braintrust/core':
-        specifier: workspace:*
-        version: link:../braintrust-sdk/core/js
+        specifier: ^0.0.34
+        version: 0.0.34
       braintrust:
-        specifier: workspace:*
-        version: link:../braintrust-sdk/js
+        specifier: ^0.0.124
+        version: 0.0.124
       zod:
         specifier: ^3.23.4
         version: 3.23.4
