@@ -31,6 +31,8 @@ async function main(): Promise<void> {
     );
   }
 
+  core.info("RUN ID: " + core.getInput("run_id"));
+
   await upsertComment("Evals in progress...");
 
   try {

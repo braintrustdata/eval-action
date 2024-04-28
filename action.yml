@@ -12,10 +12,6 @@ inputs:
   api_key:
     description: "Your Braintrust API key"
     required: true
-  github_token:
-    description: "Your GitHub token"
-    required: true
-    default: ${{ github.token }}
   root:
     description: "Root directory from which to run evals"
     required: false
@@ -30,6 +26,15 @@ inputs:
       directory. Valid values are auto, node, and python."
     required: false
     default: "auto"
+  github_token:
+    description: "Your GitHub token"
+    required: true
+    default: ${{ github.token }}
+  run_id:
+    description:
+      "The run ID to uniquely identify this run (you should not set this)"
+    required: true
+    default: ${{ github.run_id }}
 
 # Define your outputs here.
 # outputs:
