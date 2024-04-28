@@ -41,5 +41,5 @@ posted as a comment in the PR alongside a link to Braintrust. For example:
 
 To see examples of fully configured templates, see the `examples` directory:
 
-- [`node with npm`](/examples/npm.yml)
-- [`node with pnpm`](/examples/pnpm.yml)
+- [`node with npm`](examples/npm.yaml)
+- [`node with pnpm`](examples/pnpm.yaml)
