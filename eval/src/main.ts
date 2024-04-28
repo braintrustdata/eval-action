@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import z from "zod";
+import * as github from "@actions/github";
 
 import { upsertComment } from "./comment";
 import { ExperimentFailure, runEval } from "./braintrust";
@@ -32,6 +33,8 @@ async function main(): Promise<void> {
   }
 
   core.info("RUN ID: " + core.getInput("run_id"));
+  core.info("WORK REF: " + core.getInput("workflow_ref"));
+  core.info("ACTION: " + github.context.action);
 
   await upsertComment("Evals in progress...");
 

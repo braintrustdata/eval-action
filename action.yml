@@ -30,6 +30,12 @@ inputs:
     description: "Your GitHub token"
     required: true
     default: ${{ github.token }}
+  workflow_ref:
+    description:
+      "The ref of the workflow file to use for the evals. By default, it will be
+      derived from the directory."
+    required: true
+    default: ${{ github.workflow_ref }}
   run_id:
     description:
       "The run ID to uniquely identify this run (you should not set this)"
