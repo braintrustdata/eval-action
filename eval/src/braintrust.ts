@@ -13,18 +13,15 @@ function runCommand(command: string, onSummary: OnSummaryFn) {
     const process = execSync(command);
 
     process.stdout?.on("data", (text: string) => {
-      core.info("RECEIVED TEXT");
-      core.info(text);
       onSummary(
         text
           .split("\n")
           .map(line => line.trim())
           .filter(line => line.length > 0)
           .flatMap(line => {
-            let data;
             try {
-              core.info("parsing " + text);
-              return [JSON.parse(text)];
+              core.info("parsing " + line);
+              return [JSON.parse(line)];
             } catch (e) {
               core.error(`Failed to parse jsonl data: ${e}`);
               return [];
