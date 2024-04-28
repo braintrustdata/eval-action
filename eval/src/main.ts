@@ -127,7 +127,7 @@ function formatSummary(summary: ExperimentSummary) {
 
       return {
         name,
-        avg: `${round(scoreSummary.score, 2)}${diffText}`,
+        avg: `${round(scoreSummary.score * 100, 1)}%${diffText}`,
         improvements: scoreSummary.improvements,
         regressions: scoreSummary.regressions,
       };
