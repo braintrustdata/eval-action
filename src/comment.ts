@@ -12,7 +12,7 @@ type PullRequest = {
 };
 
 export async function upsertComment() {
-  const githubToken = core.getInput("github_token", { required: true });
+  const githubToken = core.getInput("github_token");
   const octokit = github.getOctokit(githubToken);
 
   const prs = await inferPullRequestsFromContext(octokit);

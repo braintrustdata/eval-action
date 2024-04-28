@@ -31,7 +31,8 @@ jobs:
       - uses: int128/comment-action@v1
         with:
           post: |
-            :wave: Hello World
+            :wave: Hello World 2
+          update-if-exists: replace
 
       - uses: pnpm/action-setup@v3
         with:
