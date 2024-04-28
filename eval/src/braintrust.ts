@@ -1,22 +1,32 @@
-import fs from "fs";
-import fsp from "fs/promises";
 import path from "path";
 import * as core from "@actions/core";
 import * as process from "process";
-import * as os from "os";
 import { exec as execSync } from "child_process";
 
 import { Params } from "./main";
 import { ExperimentSummary } from "braintrust";
 
-import REPORTER from "./reporter.txt";
-
-function runCommand(command: string) {
+function runCommand(
+  command: string,
+  onSummary: (summary: ExperimentSummary) => void,
+) {
   return new Promise((resolve, reject) => {
     const process = execSync(command);
 
-    process.stdout?.on("data", data => {
-      core.info(data); // Outputs the stdout of the command
+    process.stdout?.on("data", text => {
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        if (text.trim() === "") {
+          return;
+        }
+        core.error(`${e}`);
+      }
+
+      if (data && data.experimentName) {
+        onSummary(data as ExperimentSummary);
+      }
     });
 
     process.stderr?.on("data", data => {
@@ -31,14 +41,6 @@ function runCommand(command: string) {
       }
     });
   });
-}
-
-export interface SummaryInfo {
-  evaluator: {
-    evalName: string;
-    projectName: string;
-  };
-  summary: ExperimentSummary;
 }
 
 export async function runEval(args: Params) {

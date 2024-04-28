@@ -11,17 +11,13 @@ type PullRequest = {
   issue_number: number;
 };
 
-export async function upsertComment() {
+export async function upsertComment(text: string) {
   const githubToken = core.getInput("github_token");
   const octokit = github.getOctokit(githubToken);
 
   const prs = await inferPullRequestsFromContext(octokit);
 
-  const commentBody = `Thank you for your pull request x4!`;
-
-  await Promise.all(
-    prs.map(pr => createOrUpdateComment(octokit, pr, commentBody)),
-  );
+  await Promise.all(prs.map(pr => createOrUpdateComment(octokit, pr, text)));
 }
 
 const createOrUpdateComment = async (

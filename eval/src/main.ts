@@ -3,6 +3,7 @@ import z from "zod";
 
 import { upsertComment } from "./comment";
 import { runEval } from "./braintrust";
+import { Experiment, ExperimentSummary } from "braintrust";
 
 const paramsSchema = z.strictObject({
   api_key: z.string(),
@@ -29,10 +30,22 @@ async function main(): Promise<void> {
     );
   }
 
+  await upsertComment("Evals in progress...");
+
   const summaries = await runEval(args.data);
   core.info("Eval complete " + JSON.stringify(summaries, null, 2));
+}
 
-  await upsertComment();
+const allSummaries: ExperimentSummary[] = [];
+function onSummary(summary: ExperimentSummary) {
+  allSummaries.push(summary);
+
+  allSummaries.map((summary: ExperimentSummary) => {
+    const text = `## [${summary.experimentName}](${summary.experimentUrl})`;
+    return text;
+  });
+
+  upsertComment(allSummaries.join("\n"));
 }
 
 export async function run(): Promise<void> {
