@@ -13,6 +13,8 @@ function runCommand(command: string, onSummary: OnSummaryFn) {
     const process = execSync(command);
 
     process.stdout?.on("data", (text: string) => {
+      core.info("RECEIVED TEXT");
+      core.info(text);
       onSummary(
         text
           .split("\n")
