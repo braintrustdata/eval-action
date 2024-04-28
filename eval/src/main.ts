@@ -88,10 +88,12 @@ async function updateComments(mustRun: boolean) {
               return (
                 prefix +
                 "\n" +
-                `<detail>
+                `<details>
 <summary>Expand to see errors</summary>
+
 ${errors}              
-</detail>`
+
+</details>`
               );
             }
             const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
