@@ -42,7 +42,7 @@ jobs:
 
       # This extra hoop helps us install the braintrust sdk because we link it via a submodule
       - name: Install Dependencies (2)
-        id: install
+        id: install-2
         run: pnpm install
         working-directory: test-eval
 
