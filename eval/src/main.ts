@@ -6,7 +6,6 @@ import * as path from "path";
 import { exec as execSync } from "child_process";
 
 import { upsertComment } from "./comment";
-import { run as runBraintrust } from "braintrust/dist/cli";
 
 const exec = util.promisify(execSync);
 
@@ -46,20 +45,20 @@ async function main(): Promise<void> {
   process.chdir(path.resolve(root));
 
   // Run the command
-  runBraintrust({
-    files: paths
-      .split(" ")
-      .map(p => p.trim())
-      .filter(p => p.length > 0),
-    watch: false,
-    jsonl: false,
-    verbose: true,
-    api_key,
-    no_send_logs: false,
-    no_progress_bars: false,
-    terminate_on_failure: false,
-  });
-  // const command = `npx braintrust eval ${paths}`;
+  // runBraintrust({
+  //   files: paths
+  //     .split(" ")
+  //     .map(p => p.trim())
+  //     .filter(p => p.length > 0),
+  //   watch: false,
+  //   jsonl: false,
+  //   verbose: true,
+  //   api_key,
+  //   no_send_logs: false,
+  //   no_progress_bars: false,
+  //   terminate_on_failure: false,
+  // });
+  const command = `npx braintrust eval ${paths}`;
   // await exec(command);
 
   await upsertComment();

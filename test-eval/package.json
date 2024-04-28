@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "autoevals": "^0.0.64",
-    "braintrust": "^0.0.124"
+    "braintrust": "workspace:*"
   }
 }
