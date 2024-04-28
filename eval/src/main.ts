@@ -40,12 +40,14 @@ const allSummaries: ExperimentSummary[] = [];
 function onSummary(summary: ExperimentSummary) {
   allSummaries.push(summary);
 
-  allSummaries.map((summary: ExperimentSummary) => {
-    const text = `## [${summary.experimentName}](${summary.experimentUrl})`;
-    return text;
-  });
-
-  upsertComment(allSummaries.join("\n"));
+  upsertComment(
+    allSummaries
+      .map((summary: ExperimentSummary) => {
+        const text = `## [${summary.experimentName}](${summary.experimentUrl})`;
+        return text;
+      })
+      .join("\n"),
+  );
 }
 
 export async function run(): Promise<void> {

@@ -41,7 +41,7 @@ const createOrUpdateComment = async (
     owner: pullRequest.owner,
     repo: pullRequest.repo,
     comment_id: comment.id,
-    body,
+    body: `${body}\n${commentKey}`,
   });
   core.info(`Updated the comment ${updated.html_url}`);
 };
