@@ -11,7 +11,7 @@ const paramsSchema = z.strictObject({
   api_key: z.string(),
   root: z.string(),
   paths: z.string(),
-  runtime: z.enum(["auto", "node", "python"]),
+  runtime: z.enum(["node", "python"]),
 });
 export type Params = z.infer<typeof paramsSchema>;
 
@@ -31,8 +31,10 @@ async function main(): Promise<void> {
       "Invalid arguments: " + args.error.errors.map(e => e.message).join("\n"),
     );
   }
+  if (args.data.runtime !== "node") {
+    throw new Error("Only Node.js runtime is supported");
+  }
 
-  core.info("STEP KEY: " + core.getInput("step_key"));
   await upsertComment("Evals in progress...");
 
   try {
