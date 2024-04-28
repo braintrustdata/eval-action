@@ -34,12 +34,16 @@ async function main(): Promise<void> {
   await upsertComment("Evals in progress...");
 
   await runEval(args.data, onSummary);
+  runUpdateComments();
 }
 
 const allSummaries: ExperimentSummary[] = [];
 function onSummary(summary: ExperimentSummary) {
   allSummaries.push(summary);
+  runUpdateComments();
+}
 
+function runUpdateComments() {
   queuedUpdates += 1;
   updateComments();
 }
