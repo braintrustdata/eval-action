@@ -32,7 +32,7 @@ async function main(): Promise<void> {
 
   await upsertComment("Evals in progress...");
 
-  const summaries = await runEval(args.data);
+  const summaries = await runEval(args.data, onSummary);
   core.info("Eval complete " + JSON.stringify(summaries, null, 2));
 }
 

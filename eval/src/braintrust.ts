@@ -6,10 +6,9 @@ import { exec as execSync } from "child_process";
 import { Params } from "./main";
 import { ExperimentSummary } from "braintrust";
 
-function runCommand(
-  command: string,
-  onSummary: (summary: ExperimentSummary) => void,
-) {
+type OnSummaryFn = (summary: ExperimentSummary) => void;
+
+function runCommand(command: string, onSummary: OnSummaryFn) {
   return new Promise((resolve, reject) => {
     const process = execSync(command);
 
@@ -43,7 +42,7 @@ function runCommand(
   });
 }
 
-export async function runEval(args: Params) {
+export async function runEval(args: Params, onSummary: OnSummaryFn) {
   const { api_key, root, paths } = args;
 
   // Add the API key to the environment
@@ -56,7 +55,7 @@ export async function runEval(args: Params) {
   process.chdir(path.resolve(root));
 
   const command = `npx braintrust eval --jsonl ${paths}`;
-  await runCommand(command);
+  await runCommand(command, onSummary);
 
   /*
   // Read the summary files
