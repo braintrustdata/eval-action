@@ -26,23 +26,43 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: npm
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install Dependencies
-        id: npm-ci
-        run: npm ci
+        id: install
+        run: pnpm install
+        working-directory: test-eval
 
       - name: Check Format
         id: npm-format-check
         run: npm run format:check
+        working-directory: test-eval
 
       - name: Lint
         id: npm-lint
         run: npm run lint
+        working-directory: test-eval
 
       - name: Test
         id: npm-ci-test
         run: npm run ci-test
+        working-directory: test-eval
 
   test-action:
     name: GitHub Actions Test
