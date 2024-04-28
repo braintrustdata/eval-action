@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import z from "zod";
 
 import { upsertComment } from "./comment";
-import { runEval } from "./braintrust";
+import { ExperimentFailure, runEval } from "./braintrust";
 import { ExperimentSummary } from "braintrust";
 import { capitalize } from "@braintrust/core";
 
@@ -44,8 +44,8 @@ async function main(): Promise<void> {
   }
 }
 
-const allSummaries: ExperimentSummary[] = [];
-function onSummary(summary: ExperimentSummary[]) {
+const allSummaries: (ExperimentSummary | ExperimentFailure)[] = [];
+function onSummary(summary: (ExperimentSummary | ExperimentFailure)[]) {
   allSummaries.push(...summary);
   runUpdateComments();
 }
@@ -66,7 +66,12 @@ async function updateComments(mustRun: boolean) {
     while (queuedUpdates > 0) {
       await upsertComment(
         allSummaries
-          .map((summary: ExperimentSummary) => {
+          .map((summary: ExperimentSummary | ExperimentFailure) => {
+            if ("errors" in summary) {
+              const text = `**‼️ ${summary.evaluatorName} failed to run**`;
+              const errors = summary.errors.join("\n");
+              return text + "\n```" + errors + "```\n";
+            }
             const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
             const columns = ["Score", "Average", "Improvements", "Regressions"];
             const header = columns.join(" | ");

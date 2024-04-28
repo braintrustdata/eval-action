@@ -6,7 +6,12 @@ import { exec as execSync } from "child_process";
 import { Params } from "./main";
 import { ExperimentSummary } from "braintrust";
 
-type OnSummaryFn = (summary: ExperimentSummary[]) => void;
+export interface ExperimentFailure {
+  evaluatorName: string;
+  errors: string[];
+}
+
+type OnSummaryFn = (summary: (ExperimentSummary | ExperimentFailure)[]) => void;
 
 function runCommand(command: string, onSummary: OnSummaryFn) {
   return new Promise((resolve, reject) => {

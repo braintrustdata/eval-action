@@ -7,5 +7,5 @@ Eval("My Fail", {
   task: async (input, { span }) => {
     throw new Error("syntax error!");
   },
-  scores: [exactMatch],
+  scores: [],
 });
