@@ -28,7 +28,7 @@ You can configure the following variables:
 The action runs `braintrust eval` and collects experiment results, which are
 posted as a comment in the PR alongside a link to Braintrust. For example:
 
-### [Example] Braintrust eval report
+### Example braintrust eval report
 
 **[Say Hi Bot (HEAD-1714341466)](https://www.braintrustdata.com/app/braintrustdata.com/p/Say%20Hi%20Bot/experiments/HEAD-1714341466)**
 
