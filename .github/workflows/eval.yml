@@ -6,7 +6,7 @@ on:
     #   - 'test-eval/**'
 
 permissions:
-  pull-requests: read
+  pull-requests: write
   contents: read
 
 jobs:
