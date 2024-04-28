@@ -33,13 +33,18 @@ async function main(): Promise<void> {
 
   await upsertComment("Evals in progress...");
 
-  await runEval(args.data, onSummary);
-  runUpdateComments();
+  try {
+    await runEval(args.data, onSummary);
+    runUpdateComments();
+  } catch (error) {
+    upsertComment("‼️ Evals failed to run");
+    throw error;
+  }
 }
 
 const allSummaries: ExperimentSummary[] = [];
-function onSummary(summary: ExperimentSummary) {
-  allSummaries.push(summary);
+function onSummary(summary: ExperimentSummary[]) {
+  allSummaries.push(...summary);
   runUpdateComments();
 }
 
