@@ -17,7 +17,7 @@ export async function upsertComment() {
 
   const prs = await inferPullRequestsFromContext(octokit);
 
-  const commentBody = `Thank you for your pull request x2!`;
+  const commentBody = `Thank you for your pull request x3!`;
 
   await Promise.all(
     prs.map(pr => createOrUpdateComment(octokit, pr, commentBody))
@@ -32,14 +32,14 @@ const createOrUpdateComment = async (
   const commentKey = `<!-- braintrust_bot_comment -->`;
   const comment = await findComment(octokit, pullRequest, commentKey);
   if (!comment) {
-    core.info(`Key not found in #${pullRequest.issue_number}`);
+    core.debug(`Key not found in #${pullRequest.issue_number}`);
     const { data: created } = await octokit.rest.issues.createComment({
       owner: pullRequest.owner,
       repo: pullRequest.repo,
       issue_number: pullRequest.issue_number,
       body: `${body}\n${commentKey}`
     });
-    core.info(`Created a comment ${created.html_url}`);
+    core.debug(`Created a comment ${created.html_url}`);
     return;
   }
 
@@ -49,7 +49,7 @@ const createOrUpdateComment = async (
     comment_id: comment.id,
     body
   });
-  core.info(`Updated the comment ${updated.html_url}`);
+  core.debug(`Updated the comment ${updated.html_url}`);
 };
 
 type Comment = {

@@ -33588,7 +33588,7 @@ async function upsertComment() {
     const githubToken = core.getInput("github_token");
     const octokit = github.getOctokit(githubToken);
     const prs = await inferPullRequestsFromContext(octokit);
-    const commentBody = `Thank you for your pull request x2!`;
+    const commentBody = `Thank you for your pull request x3!`;
     await Promise.all(prs.map(pr => createOrUpdateComment(octokit, pr, commentBody)));
 }
 exports.upsertComment = upsertComment;
@@ -33596,14 +33596,14 @@ const createOrUpdateComment = async (octokit, pullRequest, body) => {
     const commentKey = `<!-- braintrust_bot_comment -->`;
     const comment = await findComment(octokit, pullRequest, commentKey);
     if (!comment) {
-        core.info(`Key not found in #${pullRequest.issue_number}`);
+        core.debug(`Key not found in #${pullRequest.issue_number}`);
         const { data: created } = await octokit.rest.issues.createComment({
             owner: pullRequest.owner,
             repo: pullRequest.repo,
             issue_number: pullRequest.issue_number,
             body: `${body}\n${commentKey}`
         });
-        core.info(`Created a comment ${created.html_url}`);
+        core.debug(`Created a comment ${created.html_url}`);
         return;
     }
     const { data: updated } = await octokit.rest.issues.updateComment({
@@ -33612,7 +33612,7 @@ const createOrUpdateComment = async (octokit, pullRequest, body) => {
         comment_id: comment.id,
         body
     });
-    core.info(`Updated the comment ${updated.html_url}`);
+    core.debug(`Updated the comment ${updated.html_url}`);
 };
 const findComment = async (octokit, pullRequest, key) => {
     const { data: comments } = await octokit.rest.issues.listComments({
