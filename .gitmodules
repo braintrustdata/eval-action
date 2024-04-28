@@ -1,0 +1,3 @@
+[submodule "braintrust-sdk"]
+	path = braintrust-sdk
+	url = https://github.com/braintrustdata/braintrust-sdk.git

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "lib": ["es2015", "dom"],
+    "target": "ES2018",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "baseUrl": "."
+  },
+  "include": ["."],
+  "exclude": ["node_modules/**", "**/dist/**"]
+}

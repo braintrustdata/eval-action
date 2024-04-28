@@ -1,24 +1,41 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "The name of your action here"
+description: "Provide a description here"
+author: "Your name or organization here"
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: 'heart'
-  color: 'red'
+  icon: "brain"
+  color: "black"
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  api_key:
+    description: "Your Braintrust API key"
     required: true
-    default: '1000'
+  github_token:
+    description: "Your GitHub token"
+    required: true
+    default: ${{ github.token }}
+  root:
+    description: "Root directory from which to run evals"
+    required: false
+    default: "."
+  paths:
+    description: "A list of paths (and glob patterns) to include in the evals"
+    required: false
+    default: "."
+  runtime:
+    description:
+      "The runtime to use for evals. By default, it will be derived from the
+      directory. Valid values are auto, node, and python."
+    required: false
+    default: "auto"
 
 # Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+# outputs:
+#   time:
+#     description: 'Your output description here'
 
 runs:
   using: node20
-  main: dist/index.js
+  main: eval/dist/index.js
