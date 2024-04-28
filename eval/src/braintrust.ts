@@ -9,14 +9,9 @@ import { exec as execSync } from "child_process";
 import { Params } from "./main";
 import { ExperimentSummary } from "braintrust";
 
-const exec = util.promisify(execSync);
+import * as REPORTER from "./reporter.txt";
 
-// Function to load file content
-function loadFileContent() {
-  const filePath = path.join(__dirname, "reporter.eval.ts");
-  return fs.readFileSync(filePath, "utf8");
-}
-const REPORTER = loadFileContent();
+const exec = util.promisify(execSync);
 
 export interface SummaryInfo {
   evaluator: {
