@@ -33590,14 +33590,47 @@ async function upsertComment() {
     const prs = await inferPullRequestsFromContext(octokit);
     const commentBody = `<!-- braintrust_bot_comment -->
 Thank you for your pull request!`;
-    for (const pr of prs) {
-        const response = await octokit.rest.issues.createComment({
-            ...pr,
-            body: commentBody
-        });
-    }
+    await Promise.all(prs.map(pr => createOrUpdateComment(octokit, pr, commentBody)));
 }
 exports.upsertComment = upsertComment;
+const createOrUpdateComment = async (octokit, pullRequest, body) => {
+    const commentKey = `<!-- braintrust_bot_comment -->`;
+    const comment = await findComment(octokit, pullRequest, commentKey);
+    if (!comment) {
+        core.info(`Key not found in #${pullRequest.issue_number}`);
+        const { data: created } = await octokit.rest.issues.createComment({
+            owner: pullRequest.owner,
+            repo: pullRequest.repo,
+            issue_number: pullRequest.issue_number,
+            body: `${body}\n${commentKey}`
+        });
+        core.debug(`Created a comment ${created.html_url}`);
+        return;
+    }
+    const { data: updated } = await octokit.rest.issues.updateComment({
+        owner: pullRequest.owner,
+        repo: pullRequest.repo,
+        comment_id: comment.id,
+        body
+    });
+    core.debug(`Updated the comment ${updated.html_url}`);
+};
+const findComment = async (octokit, pullRequest, key) => {
+    const { data: comments } = await octokit.rest.issues.listComments({
+        owner: pullRequest.owner,
+        repo: pullRequest.repo,
+        issue_number: pullRequest.issue_number,
+        sort: "created",
+        direction: "desc",
+        per_page: 100
+    });
+    core.info(`Found ${comments.length} comment(s) of #${pullRequest.issue_number}`);
+    for (const comment of comments) {
+        if (comment.body?.includes(key)) {
+            return { ...comment, body: comment.body };
+        }
+    }
+};
 const inferPullRequestsFromContext = async (octokit) => {
     const { context } = github;
     if (Number.isSafeInteger(context.issue.number)) {

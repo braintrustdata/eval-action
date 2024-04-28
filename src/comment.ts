@@ -20,13 +20,67 @@ export async function upsertComment() {
   const commentBody = `<!-- braintrust_bot_comment -->
 Thank you for your pull request!`;
 
-  for (const pr of prs) {
-    const response = await octokit.rest.issues.createComment({
-      ...pr,
-      body: commentBody
-    });
-  }
+  await Promise.all(
+    prs.map(pr => createOrUpdateComment(octokit, pr, commentBody))
+  );
 }
+
+const createOrUpdateComment = async (
+  octokit: Octokit,
+  pullRequest: PullRequest,
+  body: string
+) => {
+  const commentKey = `<!-- braintrust_bot_comment -->`;
+  const comment = await findComment(octokit, pullRequest, commentKey);
+  if (!comment) {
+    core.info(`Key not found in #${pullRequest.issue_number}`);
+    const { data: created } = await octokit.rest.issues.createComment({
+      owner: pullRequest.owner,
+      repo: pullRequest.repo,
+      issue_number: pullRequest.issue_number,
+      body: `${body}\n${commentKey}`
+    });
+    core.debug(`Created a comment ${created.html_url}`);
+    return;
+  }
+
+  const { data: updated } = await octokit.rest.issues.updateComment({
+    owner: pullRequest.owner,
+    repo: pullRequest.repo,
+    comment_id: comment.id,
+    body
+  });
+  core.debug(`Updated the comment ${updated.html_url}`);
+};
+
+type Comment = {
+  id: number;
+  body: string;
+  html_url: string;
+};
+
+const findComment = async (
+  octokit: Octokit,
+  pullRequest: PullRequest,
+  key: string
+): Promise<Comment | undefined> => {
+  const { data: comments } = await octokit.rest.issues.listComments({
+    owner: pullRequest.owner,
+    repo: pullRequest.repo,
+    issue_number: pullRequest.issue_number,
+    sort: "created",
+    direction: "desc",
+    per_page: 100
+  });
+  core.info(
+    `Found ${comments.length} comment(s) of #${pullRequest.issue_number}`
+  );
+  for (const comment of comments) {
+    if (comment.body?.includes(key)) {
+      return { ...comment, body: comment.body };
+    }
+  }
+};
 
 const inferPullRequestsFromContext = async (
   octokit: Octokit
