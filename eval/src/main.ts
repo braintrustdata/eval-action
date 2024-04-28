@@ -35,7 +35,7 @@ async function main(): Promise<void> {
 
   try {
     await runEval(args.data, onSummary);
-    runUpdateComments();
+    await updateComments(true);
   } catch (error) {
     await upsertComment("‼️ Evals failed to run");
     throw error;
@@ -52,14 +52,13 @@ function onSummary(summary: ExperimentSummary[]) {
 
 function runUpdateComments() {
   queuedUpdates += 1;
-  updateComments();
+  updateComments(false);
 }
 
 let queuedUpdates = 0;
 let currentUpdate: Promise<void> = Promise.resolve();
-async function updateComments() {
-  core.info(`QUEUED UPDATES ${queuedUpdates}`);
-  if (queuedUpdates > 1) {
+async function updateComments(mustRun: boolean) {
+  if (queuedUpdates > 1 && !mustRun) {
     return;
   }
 
