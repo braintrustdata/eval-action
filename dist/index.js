@@ -33587,6 +33587,7 @@ async function upsertComment() {
     const githubToken = core.getInput("github_token", { required: true });
     const octokit = github.getOctokit(githubToken);
     const context = github.context;
+    core.info(`Context: ${JSON.stringify(context, null, 2)}`);
     if (context.payload.pull_request == null) {
         throw new Error("No pull request found.");
     }
