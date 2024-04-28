@@ -37,9 +37,9 @@ posted as a comment in the PR alongside a link to Braintrust. For example:
 | Levenshtein | 0.83 (+3pp) | 🟢 8         | 🔴 4        |
 | Duration    | 1s (0s)     | 🟢 16        | 🔴 1        |
 
-## Examples
+## Example workflow templates
 
-To see examples of fully configured actions, see the `examples` directory:
+To see examples of fully configured templates, see the `examples` directory:
 
-- [`node with npm`](./examples/npm.yml)
-- [`node with pnpm`](./examples/pnpm.yml)
+- [`node with npm`](/examples/npm.yml)
+- [`node with pnpm`](/examples/pnpm.yml)
