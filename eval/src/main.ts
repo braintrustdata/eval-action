@@ -122,7 +122,7 @@ function formatSummary(summary: ExperimentSummary) {
       if (scoreSummary.diff !== undefined) {
         const diffN = round(scoreSummary.diff, 2) * 100;
         diffText =
-          " " + (scoreSummary.diff > 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
+          " " + (scoreSummary.diff >= 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
       }
 
       return {
@@ -139,7 +139,7 @@ function formatSummary(summary: ExperimentSummary) {
           const diffN = round(metricSummary.diff, 2);
           diffText =
             " " +
-            (metricSummary.diff > 0
+            (metricSummary.diff >= 0
               ? `(+${diffN}${metricSummary.unit})`
               : `(${diffN}${metricSummary.unit})`);
         }
