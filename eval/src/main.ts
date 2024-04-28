@@ -1,16 +1,8 @@
 import * as core from "@actions/core";
 import z from "zod";
 
-import * as util from "util";
-import * as path from "path";
-import * as os from "os";
-import * as fs from "fs/promises";
-import { exec as execSync } from "child_process";
-
 import { upsertComment } from "./comment";
 import { runEval } from "./braintrust";
-
-const exec = util.promisify(execSync);
 
 const paramsSchema = z.strictObject({
   api_key: z.string(),
