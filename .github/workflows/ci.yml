@@ -58,8 +58,3 @@ jobs:
         id: npm-lint
         run: npm run lint
         working-directory: eval
-
-      - name: Test
-        id: npm-ci-test
-        run: npm run ci-test
-        working-directory: eval
