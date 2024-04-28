@@ -9,7 +9,7 @@ import { exec as execSync } from "child_process";
 import { Params } from "./main";
 import { ExperimentSummary } from "braintrust";
 
-import * as REPORTER from "./reporter.txt";
+import REPORTER from "./reporter.txt";
 
 const exec = util.promisify(execSync);
 
