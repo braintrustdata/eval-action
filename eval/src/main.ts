@@ -57,15 +57,52 @@ async function updateComments() {
         const columns = ["Score", "Average", "Improvements", "Regressions"];
         const header = columns.join(" | ");
         const separator = columns.map(() => "---").join(" | ");
-        const rows = Object.entries(summary.scores).map(
-          ([name, summary]) =>
-            `${name} | ${summary.score} | ${
-              summary.regressions !== undefined && summary.regressions > 0
-                ? `🟢 ${summary.regressions}`
+
+        const rowData = Object.entries(summary.scores)
+          .map(([name, summary]) => {
+            let diffText = "";
+            if (summary.diff !== undefined) {
+              const diffN = round(summary.diff, 2);
+              diffText =
+                " " + (summary.diff > 0 ? `(+${diffN})` : `(-${diffN})`);
+            }
+
+            return {
+              name,
+              avg: `${round(summary.score, 2)}${diffText}`,
+              improvements: summary.improvements,
+              regressions: summary.regressions,
+            };
+          })
+          .concat(
+            Object.entries(summary.metrics ?? {}).map(([name, summary]) => {
+              let diffText = "";
+              if (summary.diff !== undefined) {
+                const diffN = round(summary.diff, 2);
+                diffText =
+                  " " +
+                  (summary.diff > 0
+                    ? `(+${diffN}${summary.unit})`
+                    : `(-${diffN}${summary.unit})`);
+              }
+              return {
+                name,
+                avg: `${round(summary.metric, 2)}${summary.unit}${diffText}`,
+                improvements: summary.improvements,
+                regressions: summary.regressions,
+              };
+            }),
+          );
+
+        const rows = rowData.map(
+          ({ name, avg, improvements, regressions }) =>
+            `${name} | ${avg} | ${
+              improvements !== undefined && improvements > 0
+                ? `🟢 ${improvements}`
                 : `🟡`
             } | ${
-              summary.regressions !== undefined && summary.regressions > 0
-                ? `🔴 ${summary.regressions}`
+              regressions !== undefined && regressions > 0
+                ? `🔴 ${regressions}`
                 : `🟡`
             }`,
         );
@@ -77,6 +114,10 @@ async function updateComments() {
   if (queuedUpdates > 0) {
     updateComments();
   }
+}
+
+function round(n: number, decimals: number) {
+  return Math.round(n * 10 ** decimals) / 10 ** decimals;
 }
 
 export async function run(): Promise<void> {

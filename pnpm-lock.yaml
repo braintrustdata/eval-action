@@ -189,8 +189,8 @@ importers:
         specifier: ^0.0.64
         version: 0.0.64
       braintrust:
-        specifier: workspace:*
-        version: link:../braintrust-sdk/js
+        specifier: ^0.0.124
+        version: 0.0.124
     devDependencies:
       '@types/node':
         specifier: ^20.12.7
@@ -2281,6 +2281,26 @@ packages:
     dependencies:
       fill-range: 7.0.1
     dev: true
+
+  /braintrust@0.0.124:
+    resolution: {integrity: sha512-fPBgpLc1eL+mYISUGmCLaXLZMN+QxOiK2yex6MoelVnaTQtrNsX+XCYTE2/Dgw5cBha0jQx6OrYCoK2bt9rf4Q==}
+    hasBin: true
+    dependencies:
+      '@ai-sdk/provider': 0.0.0
+      '@braintrust/core': 0.0.34
+      argparse: 2.0.1
+      chalk: 4.1.2
+      cli-progress: 3.12.0
+      esbuild: 0.18.20
+      graceful-fs: 4.2.11
+      minimatch: 9.0.4
+      mustache: 4.2.0
+      pluralize: 8.0.0
+      simple-git: 3.24.0
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /browserslist@4.23.0:
     resolution: {integrity: sha512-QW8HiM1shhT2GuzkvklfjcKDiWFXHOeFCIA/huJPwHsslwcydgk7X+z2zXpEijP98UCY7HbubZt5J2Zgvf0CaQ==}
