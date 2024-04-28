@@ -40,7 +40,17 @@ const allSummaries: ExperimentSummary[] = [];
 function onSummary(summary: ExperimentSummary) {
   allSummaries.push(summary);
 
-  upsertComment(
+  queuedUpdates += 1;
+  updateComments();
+}
+
+let queuedUpdates = 0;
+async function updateComments() {
+  if (queuedUpdates > 1) {
+    return;
+  }
+
+  await upsertComment(
     allSummaries
       .map((summary: ExperimentSummary) => {
         const text = `## [${summary.experimentName}](${summary.experimentUrl})`;
@@ -48,6 +58,10 @@ function onSummary(summary: ExperimentSummary) {
       })
       .join("\n"),
   );
+  queuedUpdates -= 1;
+  if (queuedUpdates > 0) {
+    updateComments();
+  }
 }
 
 export async function run(): Promise<void> {
