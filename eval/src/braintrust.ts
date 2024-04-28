@@ -6,26 +6,28 @@ import { exec as execSync } from "child_process";
 import { Params } from "./main";
 import { ExperimentSummary } from "braintrust";
 
-type OnSummaryFn = (summary: ExperimentSummary) => void;
+type OnSummaryFn = (summary: ExperimentSummary[]) => void;
 
 function runCommand(command: string, onSummary: OnSummaryFn) {
   return new Promise((resolve, reject) => {
     const process = execSync(command);
 
-    process.stdout?.on("data", text => {
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        if (text.trim() === "") {
-          return;
-        }
-        core.error(`${e}`);
-      }
-
-      if (data && data.experimentName) {
-        onSummary(data as ExperimentSummary);
-      }
+    process.stdout?.on("data", (text: string) => {
+      onSummary(
+        text
+          .split("\n")
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+          .flatMap(line => {
+            let data;
+            try {
+              return [JSON.parse(text)];
+            } catch (e) {
+              core.error(`${e}`);
+              return [];
+            }
+          }),
+      );
     });
 
     process.stderr?.on("data", data => {
