@@ -124,6 +124,9 @@ importers:
       '@actions/github':
         specifier: ^6.0.0
         version: 6.0.0
+      '@braintrust/core':
+        specifier: workspace:*
+        version: link:../braintrust-sdk/core/js
       braintrust:
         specifier: workspace:*
         version: link:../braintrust-sdk/js

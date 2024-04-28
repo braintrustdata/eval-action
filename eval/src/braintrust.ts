@@ -56,20 +56,4 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   const command = `npx braintrust eval --jsonl ${paths}`;
   await runCommand(command, onSummary);
-
-  /*
-  // Read the summary files
-  const summaryFiles = await fsp.readdir(reportersDir);
-  const summaries: SummaryInfo[] = await Promise.all(
-    summaryFiles.map(async summaryFile => {
-      const summaryPath = path.join(reportersDir, summaryFile);
-      const summaryData = JSON.parse(
-        await fsp.readFile(summaryPath, "utf8"),
-      ) as SummaryInfo;
-      return summaryData;
-    }),
-  );
-  */
-
-  return [];
 }

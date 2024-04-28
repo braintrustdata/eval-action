@@ -3,7 +3,8 @@ import z from "zod";
 
 import { upsertComment } from "./comment";
 import { runEval } from "./braintrust";
-import { Experiment, ExperimentSummary } from "braintrust";
+import { ExperimentSummary } from "braintrust";
+import { capitalize } from "@braintrust/core";
 
 const paramsSchema = z.strictObject({
   api_key: z.string(),
@@ -32,8 +33,7 @@ async function main(): Promise<void> {
 
   await upsertComment("Evals in progress...");
 
-  const summaries = await runEval(args.data, onSummary);
-  core.info("Eval complete " + JSON.stringify(summaries, null, 2));
+  await runEval(args.data, onSummary);
 }
 
 const allSummaries: ExperimentSummary[] = [];
@@ -64,7 +64,7 @@ async function updateComments() {
             if (summary.diff !== undefined) {
               const diffN = round(summary.diff, 2);
               diffText =
-                " " + (summary.diff > 0 ? `(+${diffN})` : `(-${diffN})`);
+                " " + (summary.diff > 0 ? `(+${diffN})` : `(${diffN})`);
             }
 
             return {
@@ -83,7 +83,7 @@ async function updateComments() {
                   " " +
                   (summary.diff > 0
                     ? `(+${diffN}${summary.unit})`
-                    : `(-${diffN}${summary.unit})`);
+                    : `(${diffN}${summary.unit})`);
               }
               return {
                 name,
@@ -96,7 +96,7 @@ async function updateComments() {
 
         const rows = rowData.map(
           ({ name, avg, improvements, regressions }) =>
-            `${name} | ${avg} | ${
+            `${capitalize(name)} | ${avg} | ${
               improvements !== undefined && improvements > 0
                 ? `🟢 ${improvements}`
                 : `🟡`
