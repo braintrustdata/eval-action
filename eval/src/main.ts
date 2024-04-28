@@ -53,10 +53,25 @@ async function updateComments() {
   await upsertComment(
     allSummaries
       .map((summary: ExperimentSummary) => {
-        const text = `## [${summary.experimentName}](${summary.experimentUrl})`;
-        return text;
+        const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
+        const columns = ["Score", "Average", "Improvements", "Regressions"];
+        const header = columns.join(" | ");
+        const separator = columns.map(() => "---").join(" | ");
+        const rows = Object.entries(summary.scores).map(
+          ([name, summary]) =>
+            `${name} | ${summary.score} | ${
+              summary.regressions !== undefined && summary.regressions > 0
+                ? `🟢 ${summary.regressions}`
+                : `🟡`
+            } | ${
+              summary.regressions !== undefined && summary.regressions > 0
+                ? `🔴 ${summary.regressions}`
+                : `🟡`
+            }`,
+        );
+        return `${text}\n${header}\n${separator}\n${rows.join("\n")}`;
       })
-      .join("\n"),
+      .join("\n\n"),
   );
   queuedUpdates -= 1;
   if (queuedUpdates > 0) {
