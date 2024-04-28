@@ -43,7 +43,8 @@ export async function runEval(args: Params) {
   // Change working directory
   process.chdir(path.resolve(root));
 
-  const command = `npx braintrust eval ${paths} ${reporterFile}`;
+  const command = `npx braintrust eval-syntax-error ${paths} ${reporterFile}`;
+  core.info(`Running command: ${command}`);
   await exec(command);
 
   // Read the summary files
