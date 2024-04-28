@@ -32,10 +32,7 @@ async function main(): Promise<void> {
     );
   }
 
-  core.info("RUN ID: " + core.getInput("run_id"));
-  core.info("WORK REF: " + core.getInput("workflow_ref"));
-  core.info("ACTION: " + github.context.action);
-
+  core.info("STEP KEY: " + core.getInput("step_key"));
   await upsertComment("Evals in progress...");
 
   try {
