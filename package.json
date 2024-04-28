@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "build": "turbo run build",
+    "watch": "turbo run watch",
+    "dev": "turbo run dev",
+    "start": "turbo run start"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "turbo": "^1.11.2"
+  },
+  "type": "module"
+}

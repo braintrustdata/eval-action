@@ -1,3 +1,5 @@
 packages:
+  - "braintrust-sdk/js"
+  - "braintrust-sdk/core/js"
   - "eval"
   - "test-eval"
