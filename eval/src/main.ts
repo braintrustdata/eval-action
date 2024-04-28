@@ -62,9 +62,9 @@ async function updateComments() {
           .map(([name, summary]) => {
             let diffText = "";
             if (summary.diff !== undefined) {
-              const diffN = round(summary.diff, 2);
+              const diffN = round(summary.diff, 2) * 100;
               diffText =
-                " " + (summary.diff > 0 ? `(+${diffN})` : `(${diffN})`);
+                " " + (summary.diff > 0 ? `(+${diffN}pp)` : `(${diffN}pp)`);
             }
 
             return {
