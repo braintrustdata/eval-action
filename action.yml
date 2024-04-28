@@ -34,11 +34,6 @@ inputs:
     required: true
     default: ${{ github.workflow_ref }}-${{ github.action }}
 
-# Define your outputs here.
-# outputs:
-#   time:
-#     description: 'Your output description here'
-
 runs:
   using: node20
   main: eval/dist/index.js
