@@ -31,7 +31,7 @@
     "format:check": "npx prettier --check .",
     "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
     "watch": "npm run package:watch",
-    "package": "esbuild --platform=node --bundle src/main.ts  --outfile=dist/index.js --minify --sourcemap --target=es2020 --loader:.txt=text",
+    "package": "esbuild --platform=node --bundle src/index.ts  --outfile=dist/index.js --minify --sourcemap --target=es2020 --loader:.txt=text",
     "package:watch": "npm run package -- --watch",
     "test": "npx jest",
     "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
