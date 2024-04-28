@@ -33588,8 +33588,7 @@ async function upsertComment() {
     const githubToken = core.getInput("github_token");
     const octokit = github.getOctokit(githubToken);
     const prs = await inferPullRequestsFromContext(octokit);
-    const commentBody = `<!-- braintrust_bot_comment -->
-Thank you for your pull request!`;
+    const commentBody = `Thank you for your pull request x2!`;
     await Promise.all(prs.map(pr => createOrUpdateComment(octokit, pr, commentBody)));
 }
 exports.upsertComment = upsertComment;
@@ -33604,7 +33603,7 @@ const createOrUpdateComment = async (octokit, pullRequest, body) => {
             issue_number: pullRequest.issue_number,
             body: `${body}\n${commentKey}`
         });
-        core.debug(`Created a comment ${created.html_url}`);
+        core.info(`Created a comment ${created.html_url}`);
         return;
     }
     const { data: updated } = await octokit.rest.issues.updateComment({
@@ -33613,7 +33612,7 @@ const createOrUpdateComment = async (octokit, pullRequest, body) => {
         comment_id: comment.id,
         body
     });
-    core.debug(`Updated the comment ${updated.html_url}`);
+    core.info(`Updated the comment ${updated.html_url}`);
 };
 const findComment = async (octokit, pullRequest, key) => {
     const { data: comments } = await octokit.rest.issues.listComments({
@@ -33732,7 +33731,7 @@ async function main() {
     process.chdir(path.resolve(root));
     // Run the command
     const command = `npx braintrust eval ${paths}`;
-    await exec(command);
+    // await exec(command);
     await (0, comment_1.upsertComment)();
 }
 async function run() {

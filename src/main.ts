@@ -46,7 +46,7 @@ async function main(): Promise<void> {
 
   // Run the command
   const command = `npx braintrust eval ${paths}`;
-  await exec(command);
+  // await exec(command);
 
   await upsertComment();
 }

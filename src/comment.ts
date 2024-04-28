@@ -39,7 +39,7 @@ const createOrUpdateComment = async (
       issue_number: pullRequest.issue_number,
       body: `${body}\n${commentKey}`
     });
-    core.debug(`Created a comment ${created.html_url}`);
+    core.info(`Created a comment ${created.html_url}`);
     return;
   }
 
@@ -49,7 +49,7 @@ const createOrUpdateComment = async (
     comment_id: comment.id,
     body
   });
-  core.debug(`Updated the comment ${updated.html_url}`);
+  core.info(`Updated the comment ${updated.html_url}`);
 };
 
 type Comment = {
