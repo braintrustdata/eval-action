@@ -37,7 +37,6 @@ async function main(): Promise<void> {
     await runEval(args.data, onSummary);
     await updateComments(true);
   } catch (error) {
-    await upsertComment("‼️ Evals failed to run");
     core.error(`${error}`);
     throw error;
   } finally {
