@@ -142,11 +142,15 @@ ${errors}
                 `${capitalize(name)} | ${avg} | ${
                   improvements !== undefined && improvements > 0
                     ? `🟢 ${improvements}`
-                    : `🟡`
+                    : improvements === 0
+                      ? `🟡 0`
+                      : `-`
                 } | ${
                   regressions !== undefined && regressions > 0
                     ? `🔴 ${regressions}`
-                    : `🟡`
+                    : regressions === 0
+                      ? `🟢 0`
+                      : `-`
                 }`,
             );
             return `${text}\n${header}\n${separator}\n${rows.join("\n")}`;
