@@ -40,9 +40,10 @@ async function main(): Promise<void> {
 
   try {
     await runEval(args.data, onSummary);
-    await updateComments(true);
+    await runUpdateComments(true);
   } catch (error) {
-    core.error(`${error}`);
+    core.error(`Eval command failed: ${error}`);
+    await upsertComment(`${TITLE}Evals failed: ${error}`);
     throw error;
   } finally {
     await currentUpdate;
@@ -52,12 +53,12 @@ async function main(): Promise<void> {
 const allSummaries: (ExperimentSummary | ExperimentFailure)[] = [];
 function onSummary(summary: (ExperimentSummary | ExperimentFailure)[]) {
   allSummaries.push(...summary);
-  runUpdateComments();
+  runUpdateComments(false);
 }
 
-function runUpdateComments() {
+async function runUpdateComments(mustRun: boolean) {
   queuedUpdates += 1;
-  updateComments(false);
+  await updateComments(mustRun);
 }
 
 let queuedUpdates = 0;
@@ -69,43 +70,46 @@ async function updateComments(mustRun: boolean) {
 
   currentUpdate = (async () => {
     while (queuedUpdates > 0) {
-      await upsertComment(
-        TITLE +
-          allSummaries
-            .map((summary: ExperimentSummary | ExperimentFailure, idx) => {
-              // As a somewhat ridiculous hack, we know that we _first_ print errors, and then the summary,
-              // for experiments that fail.
-              if (idx > 0 && "errors" in allSummaries[idx - 1]) {
-                return "";
-              }
-              if ("errors" in summary) {
-                let prefix = "**‼️** ";
-                if (
-                  idx < allSummaries.length - 1 &&
-                  !("errors" in allSummaries[idx + 1])
-                ) {
-                  prefix += formatSummary(
-                    allSummaries[idx + 1] as ExperimentSummary,
-                  );
-                } else {
-                  prefix += `**${summary.evaluatorName} failed to run**`;
-                }
-                const errors = "```\n" + summary.errors.join("\n") + "\n```";
-                return (
-                  prefix +
-                  "\n" +
-                  `<details>
+      const summaryTables = allSummaries.map(
+        (summary: ExperimentSummary | ExperimentFailure, idx) => {
+          // As a somewhat ridiculous hack, we know that we _first_ print errors, and then the summary,
+          // for experiments that fail.
+          if (idx > 0 && "errors" in allSummaries[idx - 1]) {
+            return "";
+          }
+          if ("errors" in summary) {
+            let prefix = "**‼️** ";
+            if (
+              idx < allSummaries.length - 1 &&
+              !("errors" in allSummaries[idx + 1])
+            ) {
+              prefix += formatSummary(
+                allSummaries[idx + 1] as ExperimentSummary,
+              );
+            } else {
+              prefix += `**${summary.evaluatorName} failed to run**`;
+            }
+            const errors = "```\n" + summary.errors.join("\n") + "\n```";
+            return (
+              prefix +
+              "\n" +
+              `<details>
 <summary>Expand to see errors</summary>
 
 ${errors}              
 
 </details>`
-                );
-              }
-              return formatSummary(summary);
-            })
-            .join("\n\n"),
+            );
+          }
+          return formatSummary(summary);
+        },
       );
+      const comment =
+        TITLE +
+        (summaryTables.length > 0
+          ? summaryTables.join("\n\n")
+          : "No experiments to report");
+      await upsertComment(comment);
       queuedUpdates -= 1;
     }
   })();
