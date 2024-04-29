@@ -69,6 +69,7 @@ async function updateComments(mustRun: boolean) {
 
   currentUpdate = (async () => {
     while (queuedUpdates > 0) {
+      core.info("UPDATING COMMENT");
       await upsertComment(
         TITLE +
           allSummaries
@@ -106,6 +107,7 @@ ${errors}
             })
             .join("\n\n"),
       );
+      core.info("DONE UPDATING COMMENT");
       queuedUpdates -= 1;
     }
   })();
