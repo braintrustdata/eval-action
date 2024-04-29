@@ -23,6 +23,12 @@ inputs:
   runtime:
     description: "The runtime to use for evals. Valid values: node, python."
     required: true
+  use_proxy:
+    description:
+      "Whether to use the Braintrust proxy (to cache LLM calls). Set to 'true'
+      or 'false'."
+    required: true
+    default: "true"
   github_token:
     description: "Your GitHub token"
     required: true

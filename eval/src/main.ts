@@ -11,6 +11,11 @@ const paramsSchema = z.strictObject({
   root: z.string(),
   paths: z.string(),
   runtime: z.enum(["node", "python"]),
+  use_proxy: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean()),
 });
 export type Params = z.infer<typeof paramsSchema>;
 
@@ -26,6 +31,7 @@ async function main(): Promise<void> {
     root: core.getInput("root"),
     paths: core.getInput("paths"),
     runtime: core.getInput("runtime"),
+    use_proxy: core.getInput("use_proxy"),
   });
   if (!args.success) {
     throw new Error(

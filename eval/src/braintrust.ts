@@ -52,8 +52,13 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   // Add the API key to the environment
   core.exportVariable("BRAINTRUST_API_KEY", api_key);
+
   if (!process.env.OPENAI_API_KEY) {
     core.exportVariable("OPENAI_API_KEY", api_key);
+  }
+
+  if (args.use_proxy) {
+    core.exportVariable("OPENAI_BASE_URL", "https://braintrustproxy.com/v1");
   }
 
   // Change working directory
