@@ -1,6 +1,6 @@
-name: "The name of your action here"
-description: "Provide a description here"
-author: "Your name or organization here"
+name: "Braintrust eval"
+description: "Automatically run evals on your AI project using Braintrust."
+author: "braintrustdata"
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
