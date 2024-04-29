@@ -1,7 +1,7 @@
 name: Run evals
 
 on:
-  dispatch:
+  push:
     # files:
     #   - 'test-eval/**'
 
@@ -56,15 +56,7 @@ jobs:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           root: test-eval
           runtime: node
-          paths: tutorial.eval.ts
-
-      - name: Run Evals (2)
-        uses: ./
-        with:
-          api_key: ${{ secrets.BRAINTRUST_API_KEY }}
-          root: test-eval
-          runtime: node
-          paths: tutorial.eval.ts
+          paths: ai-search.eval.ts
 
       # - name: Start terminal session
       #   uses: mxschmitt/action-tmate@v3
