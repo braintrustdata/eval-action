@@ -41,7 +41,7 @@ async function main(): Promise<void> {
   try {
     // await runEval(args.data, onSummary);
     core.info("DONE RUNNING EVALS");
-    await updateComments(true);
+    await runUpdateComments(true);
     core.info("DONE UPDATING COMMENTS");
   } catch (error) {
     core.error(`Eval command failed: ${error}`);
@@ -57,12 +57,12 @@ async function main(): Promise<void> {
 const allSummaries: (ExperimentSummary | ExperimentFailure)[] = [];
 function onSummary(summary: (ExperimentSummary | ExperimentFailure)[]) {
   allSummaries.push(...summary);
-  runUpdateComments();
+  runUpdateComments(false);
 }
 
-function runUpdateComments() {
+async function runUpdateComments(mustRun: boolean) {
   queuedUpdates += 1;
-  updateComments(false);
+  await updateComments(mustRun);
 }
 
 let queuedUpdates = 0;
