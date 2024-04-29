@@ -74,45 +74,46 @@ async function updateComments(mustRun: boolean) {
 
   currentUpdate = (async () => {
     while (queuedUpdates > 0) {
-      core.info("UPDATING COMMENT");
-      await upsertComment(
-        TITLE +
-          allSummaries
-            .map((summary: ExperimentSummary | ExperimentFailure, idx) => {
-              // As a somewhat ridiculous hack, we know that we _first_ print errors, and then the summary,
-              // for experiments that fail.
-              if (idx > 0 && "errors" in allSummaries[idx - 1]) {
-                return "";
-              }
-              if ("errors" in summary) {
-                let prefix = "**‼️** ";
-                if (
-                  idx < allSummaries.length - 1 &&
-                  !("errors" in allSummaries[idx + 1])
-                ) {
-                  prefix += formatSummary(
-                    allSummaries[idx + 1] as ExperimentSummary,
-                  );
-                } else {
-                  prefix += `**${summary.evaluatorName} failed to run**`;
-                }
-                const errors = "```\n" + summary.errors.join("\n") + "\n```";
-                return (
-                  prefix +
-                  "\n" +
-                  `<details>
+      const summaryTables = allSummaries.map(
+        (summary: ExperimentSummary | ExperimentFailure, idx) => {
+          // As a somewhat ridiculous hack, we know that we _first_ print errors, and then the summary,
+          // for experiments that fail.
+          if (idx > 0 && "errors" in allSummaries[idx - 1]) {
+            return "";
+          }
+          if ("errors" in summary) {
+            let prefix = "**‼️** ";
+            if (
+              idx < allSummaries.length - 1 &&
+              !("errors" in allSummaries[idx + 1])
+            ) {
+              prefix += formatSummary(
+                allSummaries[idx + 1] as ExperimentSummary,
+              );
+            } else {
+              prefix += `**${summary.evaluatorName} failed to run**`;
+            }
+            const errors = "```\n" + summary.errors.join("\n") + "\n```";
+            return (
+              prefix +
+              "\n" +
+              `<details>
 <summary>Expand to see errors</summary>
 
 ${errors}              
 
 </details>`
-                );
-              }
-              return formatSummary(summary);
-            })
-            .join("\n\n"),
+            );
+          }
+          return formatSummary(summary);
+        },
       );
-      core.info("DONE UPDATING COMMENT");
+      const comment =
+        TITLE +
+        (summaryTables.length > 0
+          ? summaryTables.join("\n\n")
+          : "No experiments to report");
+      await upsertComment(comment);
       queuedUpdates -= 1;
     }
   })();
