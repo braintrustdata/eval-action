@@ -4,8 +4,8 @@ author: "braintrustdata"
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: "brain"
-  color: "black"
+  icon: "activity"
+  color: "#2563EB"
 
 # Define your inputs here.
 inputs:
