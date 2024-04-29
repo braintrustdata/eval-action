@@ -36,16 +36,21 @@ async function main(): Promise<void> {
     throw new Error("Only Node.js runtime is supported");
   }
 
-  await upsertComment(`${TITLE}Evals in progress... ⌛`);
+  await upsertComment(`${TITLE}Evals are in progress... ⌛`);
 
   try {
-    await runEval(args.data, onSummary);
+    // await runEval(args.data, onSummary);
+    core.info("DONE RUNNING EVALS");
     await updateComments(true);
-    await currentUpdate;
+    core.info("DONE UPDATING COMMENTS");
   } catch (error) {
     core.error(`Eval command failed: ${error}`);
     await upsertComment(`${TITLE}Evals failed: ${error}`);
     throw error;
+  } finally {
+    core.info("AWAITING UPDATE");
+    await currentUpdate;
+    core.info("DONE AWAITING UPDATE");
   }
 }
 
