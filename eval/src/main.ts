@@ -41,11 +41,11 @@ async function main(): Promise<void> {
   try {
     await runEval(args.data, onSummary);
     await updateComments(true);
+    await currentUpdate;
   } catch (error) {
     core.error(`${error}`);
+    await upsertComment(`${TITLE}Evals failed: ${error}`);
     throw error;
-  } finally {
-    await currentUpdate;
   }
 }
 
