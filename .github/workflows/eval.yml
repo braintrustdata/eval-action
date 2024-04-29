@@ -1,7 +1,7 @@
 name: Run evals
 
 on:
-  dispatch:
+  push:
     # files:
     #   - 'test-eval/**'
 
