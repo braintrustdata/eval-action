@@ -22,6 +22,9 @@ You can configure the following variables:
 - `paths`: Specific paths, relative to the root, containing evals you'd like to
   run.
 - `runtime`: Either `node` or `python`
+- `use_proxy`: Either `true` or `false`. If set, `OPENAI_BASE_URL` will be set
+  to `https://braintrustproxy.com/v1`, which will automatically cache repetitive
+  LLM calls and run your evals faster. Defaults to `true`.
 
 ## How it works
 
