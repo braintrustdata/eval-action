@@ -36,9 +36,9 @@ posted as a comment in the PR alongside a link to Braintrust. For example:
 **[Say Hi Bot (HEAD-1714341466)](https://www.braintrustdata.com/app/braintrustdata.com/p/Say%20Hi%20Bot/experiments/HEAD-1714341466)**
 
 | Score       | Average     | Improvements | Regressions |
-| ----------- | ----------- | ------------ | ----------- |
-| Levenshtein | 0.83 (+3pp) | 🟢 8         | 🔴 4        |
-| Duration    | 1s (0s)     | 🟢 16        | 🔴 1        |
+| ----------- | ----------- | -----------: | ----------: |
+| Levenshtein | 0.83 (+3pp) |         8 🟢 |        4 🔴 |
+| Duration    | 1s (0s)     |        16 🟢 |        1 🔴 |
 
 ## Example workflow templates
 
