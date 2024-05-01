@@ -126,7 +126,8 @@ function formatSummary(summary: ExperimentSummary) {
   const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
   const columns = ["Score", "Average", "Improvements", "Regressions"];
   const header = columns.join(" | ");
-  const separator = columns.map(() => "---").join(" | ");
+  // Right align the Improvements and Regressions column cells
+  const separator = columns.map((_, idx) => idx > 1 ? "---:" : ":---").join(" | ");
 
   const rowData = Object.entries(summary.scores)
     .map(([name, scoreSummary]) => {
@@ -172,12 +173,12 @@ function formatSummary(summary: ExperimentSummary) {
     ({ name, avg, improvements, regressions }) =>
       `${capitalize(name)} | ${avg} | ${
         improvements !== undefined && improvements > 0
-          ? `🟢 ${improvements}`
-          : `🟡`
+          ? `${improvements} 🟢`
+          : `-`
       } | ${
         regressions !== undefined && regressions > 0
-          ? `🔴 ${regressions}`
-          : `🟡`
+          ? `${regressions} 🔴`
+          : `-`
       }`,
   );
   return `${text}\n${header}\n${separator}\n${rows.join("\n")}`;
