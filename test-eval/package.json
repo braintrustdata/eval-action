@@ -14,6 +14,6 @@
     "braintrust": "^0.0.124"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7"
+    "@types/node": "^20.14.9"
   }
 }
