@@ -69,9 +69,9 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",
-    "@braintrust/core": "^0.0.34",
-    "braintrust": "^0.0.124",
-    "zod": "^3.23.4"
+    "@braintrust/core": "^0.0.42",
+    "braintrust": "^0.0.137",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
