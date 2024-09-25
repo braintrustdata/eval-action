@@ -97,5 +97,3 @@ posted as a comment in the PR alongside a link to Braintrust. For example:
 | ----------- | ----------- | -----------: | ----------: |
 | Levenshtein | 0.83 (+3pp) |         8 🟢 |        4 🔴 |
 | Duration    | 1s (0s)     |        16 🟢 |        1 🔴 |
-
-## Example workflow templates
