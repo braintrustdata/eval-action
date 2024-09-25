@@ -7,10 +7,11 @@ const data = Array.from({ length: NUM_EXAMPLES }, (_, i) => ({
   expected: `Hi Foo${i}`,
 }));
 
-Eval("Say Hi Bot", {
+Eval("Console logging", {
   data: () => data,
   task: async input => {
     console.log("distracting text");
+    console.log(JSON.stringify({ input }));
     return `Hi Foo${Math.floor(Math.random() * NUM_EXAMPLES)}`; // Replace with your LLM call
   },
   scores: [LevenshteinScorer],
