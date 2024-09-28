@@ -10,8 +10,9 @@ const data = Array.from({ length: NUM_EXAMPLES }, (_, i) => ({
 Eval("Console logging", {
   data: () => data,
   task: async input => {
-    console.log("distracting text");
-    console.log(JSON.stringify({ input }));
+    // Uncomment to break the eval via spurious console logs
+    // console.log("distracting text");
+    // console.log(JSON.stringify({ input }));
     return `Hi Foo${Math.floor(Math.random() * NUM_EXAMPLES)}`; // Replace with your LLM call
   },
   scores: [LevenshteinScorer],
