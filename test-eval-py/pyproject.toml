@@ -1,0 +1,10 @@
+[project]
+name = "test-eval-py"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "autoevals>=0.0.92",
+    "braintrust>=0.0.160",
+]

@@ -64,6 +64,16 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   // Change working directory
   process.chdir(path.resolve(root));
 
-  const command = `npx braintrust eval --jsonl ${paths}`;
+  let command: string;
+  switch (args.runtime) {
+    case "node":
+      command = `npx braintrust eval --jsonl ${paths}`;
+      break;
+    case "python":
+      command = `braintrust eval --jsonl ${paths}`;
+      break;
+    default:
+      throw new Error(`Unsupported runtime: ${args.runtime}`);
+  }
   await runCommand(command, onSummary);
 }

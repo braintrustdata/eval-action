@@ -75,14 +75,14 @@ jobs:
           root: my_eval_dir
 ```
 
-> [!IMPORTANT]
-> You must specify `permissions` for the action to leave comments on your PR.
-> Without these permissions, you'll see Github API errors.
+> [!IMPORTANT] You must specify `permissions` for the action to leave comments
+> on your PR. Without these permissions, you'll see Github API errors.
 
 To see examples of fully configured templates, see the `examples` directory:
 
 - [`node with npm`](examples/npm.yml)
 - [`node with pnpm`](examples/pnpm.yml)
+- [`python`](examples/python.yml)
 
 ## How it works
 
