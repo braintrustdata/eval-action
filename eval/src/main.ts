@@ -38,9 +38,6 @@ async function main(): Promise<void> {
       `Invalid arguments: ${args.error.errors.map(e => e.message).join("\n")}`,
     );
   }
-  if (args.data.runtime !== "node") {
-    throw new Error("Only Node.js runtime is supported");
-  }
 
   await upsertComment(`${TITLE}Evals in progress... ⌛`);
 
