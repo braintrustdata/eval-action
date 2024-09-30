@@ -36,6 +36,8 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
                 ]),
               );
               // TODO: This is hacky and we should be parsing what comes off the wire
+              core.info(`${line}`);
+              core.info(`${JSON.stringify(camelCaseLine)}`);
               return [camelCaseLine as unknown as ExperimentSummary];
             } catch (e) {
               core.error(`Failed to parse jsonl data: ${e}`);
