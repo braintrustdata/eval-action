@@ -12,6 +12,10 @@ export interface ExperimentFailure {
 
 type OnSummaryFn = (summary: (ExperimentSummary | ExperimentFailure)[]) => void;
 
+function snakeToCamelCase(str: string) {
+  return str.replace(/([-_][a-z])/g, group => group.charAt(1).toUpperCase());
+}
+
 async function runCommand(command: string, onSummary: OnSummaryFn) {
   return new Promise((resolve, reject) => {
     const process = execSync(command);
@@ -24,7 +28,15 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
           .filter(line => line.length > 0)
           .flatMap(line => {
             try {
-              return [JSON.parse(line)];
+              const parsedLine = JSON.parse(line);
+              const camelCaseLine = Object.fromEntries(
+                Object.entries(parsedLine).map(([key, value]) => [
+                  snakeToCamelCase(key),
+                  value,
+                ]),
+              );
+              // TODO: This is hacky and we should be parsing what comes off the wire
+              return [camelCaseLine as unknown as ExperimentSummary];
             } catch (e) {
               core.error(`Failed to parse jsonl data: ${e}`);
               return [];
