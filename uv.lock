@@ -1,6 +1,12 @@
 version = 1
 requires-python = ">=3.12"
 
+[manifest]
+members = [
+    "eval-action",
+    "test-eval",
+]
+
 [[package]]
 name = "braintrust"
 version = "0.0.160"
@@ -174,6 +180,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/e8/ed/3df5ab8bb0c12f86c
 wheels = [
     { url = "https://files.pythonhosted.org/packages/49/58/97655efdfeb5b4eeab85b1fc5d3fa1023661246c2ab2a26ea8e47402d4f2/sseclient_py-1.8.0-py2.py3-none-any.whl", hash = "sha256:4ecca6dc0b9f963f8384e9d7fd529bf93dd7d708144c4fb5da0e0a1a926fee83", size = 8828 },
 ]
+
+[[package]]
+name = "test-eval"
+version = "0.1.0"
+source = { virtual = "test-eval" }
+dependencies = [
+    { name = "braintrust" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "braintrust", specifier = ">=0.0.160" }]
 
 [[package]]
 name = "tqdm"
