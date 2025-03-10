@@ -8,6 +8,6 @@
   "dependencies": {
   },
   "devDependencies": {
-    "turbo": "^1.11.2"
+    "turbo": "^2.4.4"
   }
 }
