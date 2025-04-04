@@ -79,10 +79,10 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   let command: string;
   switch (args.runtime) {
     case "node":
-      command = `npx braintrust eval --jsonl ${paths}`;
+      command = `npx braintrust eval --jsonl --terminate-on-failure ${paths}`;
       break;
     case "python":
-      command = `braintrust eval --jsonl ${paths}`;
+      command = `braintrust eval --jsonl --terminate-on-failure ${paths}`;
       break;
     default:
       throw new Error(`Unsupported runtime: ${args.runtime}`);
