@@ -16,7 +16,7 @@ simply include the following step in an action file:
 You can configure the following variables:
 
 - `api_key`: Your
-  [Braintrust API key](https://www.braintrust.dev/docs/welcome/start#create-an-api-key).
+  [Braintrust API key](https://www.braintrust.dev/app/settings/api-keys).
 - `root`: The root directory containing your evals (defaults to `'.'`). The root
   directory must either have `node` or `python` configured.
 - `paths`: Specific paths, relative to the root, containing evals you'd like to
