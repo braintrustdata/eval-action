@@ -29,6 +29,12 @@ inputs:
       or 'false'."
     required: true
     default: "true"
+  terminate_on_failure:
+    description:
+      "Whether to terminate the evaluation process when an error occurs. Set to 'true'
+      or 'false'."
+    required: false
+    default: "false"
   github_token:
     description: "Your GitHub token"
     required: true

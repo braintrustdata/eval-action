@@ -30,7 +30,7 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-     - name: Setup Node.js
+      - name: Setup Node.js
         id: setup-node
         uses: actions/setup-node@v4
         with:
@@ -83,5 +83,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist/
-        working-directory: eval
+          path: eval/dist/

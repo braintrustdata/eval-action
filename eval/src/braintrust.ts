@@ -60,7 +60,7 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
 }
 
 export async function runEval(args: Params, onSummary: OnSummaryFn) {
-  const { api_key, root, paths } = args;
+  const { api_key, root, paths, terminate_on_failure } = args;
 
   // Add the API key to the environment
   core.exportVariable("BRAINTRUST_API_KEY", api_key);
@@ -77,12 +77,14 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   process.chdir(path.resolve(root));
 
   let command: string;
+  const terminateFlag = terminate_on_failure ? "--terminate-on-failure" : "";
+
   switch (args.runtime) {
     case "node":
-      command = `npx braintrust eval --jsonl ${paths}`;
+      command = `npx braintrust eval --jsonl ${terminateFlag} ${paths}`;
       break;
     case "python":
-      command = `braintrust eval --jsonl ${paths}`;
+      command = `braintrust eval --jsonl ${terminateFlag} ${paths}`;
       break;
     default:
       throw new Error(`Unsupported runtime: ${args.runtime}`);

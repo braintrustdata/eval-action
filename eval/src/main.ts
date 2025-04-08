@@ -16,6 +16,12 @@ const paramsSchema = z.strictObject({
     .toLowerCase()
     .transform(x => JSON.parse(x))
     .pipe(z.boolean()),
+  terminate_on_failure: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean())
+    .default("false"),
 });
 export type Params = z.infer<typeof paramsSchema>;
 
@@ -32,6 +38,7 @@ async function main(): Promise<void> {
     paths: core.getInput("paths"),
     runtime: core.getInput("runtime"),
     use_proxy: core.getInput("use_proxy"),
+    terminate_on_failure: core.getInput("terminate_on_failure"),
   });
   if (!args.success) {
     throw new Error(
