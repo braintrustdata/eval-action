@@ -25,6 +25,8 @@ You can configure the following variables:
 - `use_proxy`: Either `true` or `false`. If set, `OPENAI_BASE_URL` will be set
   to `https://braintrustproxy.com/v1`, which will automatically cache repetitive
   LLM calls and run your evals faster. Defaults to `true`.
+- `terminate_on_failure`: Either `true` or `false`. If set to `true`, the evaluation
+  process will stop when an error occurs. Defaults to `false`.
 
 ## Full example
 
