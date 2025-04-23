@@ -1,10 +1,10 @@
 import * as core from "@actions/core";
-import z from "zod";
 
 import { upsertComment } from "./comment";
 import { ExperimentFailure, runEval } from "./braintrust";
 import { ExperimentSummary } from "braintrust";
 import { capitalize } from "@braintrust/core";
+import { z } from "zod";
 
 const paramsSchema = z.strictObject({
   api_key: z.string(),
@@ -106,7 +106,7 @@ async function updateComments(mustRun: boolean) {
               `<details>
 <summary>Expand to see errors</summary>
 
-${errors}              
+${errors}
 
 </details>`
             );
