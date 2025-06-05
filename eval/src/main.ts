@@ -22,6 +22,7 @@ const paramsSchema = z.strictObject({
     .transform(x => JSON.parse(x))
     .pipe(z.boolean())
     .default("false"),
+  app_url: z.string().optional(),
 });
 export type Params = z.infer<typeof paramsSchema>;
 
@@ -39,6 +40,7 @@ async function main(): Promise<void> {
     runtime: core.getInput("runtime"),
     use_proxy: core.getInput("use_proxy"),
     terminate_on_failure: core.getInput("terminate_on_failure"),
+    app_url: core.getInput("app_url"),
   });
   if (!args.success) {
     throw new Error(
