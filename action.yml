@@ -45,6 +45,9 @@ inputs:
       what you're doing."
     required: true
     default: ${{ github.workflow_ref }}-${{ github.action }}
+  app_url:
+    description: Specify a custom Braintrust app url
+    required: false
 
 runs:
   using: node20
