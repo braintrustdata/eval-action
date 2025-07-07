@@ -17,6 +17,7 @@ function snakeToCamelCase(str: string) {
 }
 
 async function runCommand(command: string, onSummary: OnSummaryFn) {
+  core.info(`> $ ${command}`);
   return new Promise((resolve, reject) => {
     const process = execSync(command);
 
