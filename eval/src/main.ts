@@ -6,8 +6,8 @@ import { ExperimentSummary } from "braintrust";
 import { capitalize } from "@braintrust/core";
 import { z } from "zod";
 
-const nodeManagers = ["npm", "pnpm", "yarn"] as const;
-const pythonManagers = ["pip", "uv"] as const;
+const nodeManagers = ["npm", "pnpm", "yarn"];
+const pythonManagers = ["pip", "uv"];
 
 const paramsSchema = z
   .strictObject({
@@ -17,7 +17,7 @@ const paramsSchema = z
     runtime: z.enum(["node", "python"]),
     package_manager: z
       .enum([
-        ...([""] as const), // default
+        "",
         ...nodeManagers,
         ...pythonManagers,
       ])
