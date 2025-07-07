@@ -34,7 +34,7 @@ jobs:
           pip install -r test-eval-py/requirements.txt
 
       - name: Run Evals
-        uses: braintrustdata/eval-action@v1
+        uses: braintrustdata/eval-action@v1.0.14
         with:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           runtime: python
