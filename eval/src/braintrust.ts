@@ -113,7 +113,5 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   const command = `${baseCommand} eval --jsonl ${terminateFlag} ${paths}`;
 
-  throw new Error(command);
-
   await runCommand(command, onSummary);
 }
