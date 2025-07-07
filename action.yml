@@ -23,6 +23,12 @@ inputs:
   runtime:
     description: "The runtime to use for evals. Valid values: node, python."
     required: true
+  package_manager:
+    description:
+      "The package manager to use for evals. Valid values: npm, pnpm, yarn, pip,
+      or uv depending on the runtime."
+    required: false
+    default: ""
   use_proxy:
     description:
       "Whether to use the Braintrust proxy (to cache LLM calls). Set to 'true'
@@ -31,8 +37,8 @@ inputs:
     default: "true"
   terminate_on_failure:
     description:
-      "Whether to terminate the evaluation process when an error occurs. Set to 'true'
-      or 'false'."
+      "Whether to terminate the evaluation process when an error occurs. Set to
+      'true' or 'false'."
     required: false
     default: "false"
   github_token:

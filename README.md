@@ -22,11 +22,13 @@ You can configure the following variables:
 - `paths`: Specific paths, relative to the root, containing evals you'd like to
   run.
 - `runtime`: Either `node` or `python`
+- `package_manager`: Either `npm`, `pnpm`, or `yarn` for a `node` runtime, or
+  `pip` or `uv` for a `python` runtime.
 - `use_proxy`: Either `true` or `false`. If set, `OPENAI_BASE_URL` will be set
   to `https://braintrustproxy.com/v1`, which will automatically cache repetitive
   LLM calls and run your evals faster. Defaults to `true`.
-- `terminate_on_failure`: Either `true` or `false`. If set to `true`, the evaluation
-  process will stop when an error occurs. Defaults to `false`.
+- `terminate_on_failure`: Either `true` or `false`. If set to `true`, the
+  evaluation process will stop when an error occurs. Defaults to `false`.
 
 ## Full example
 
@@ -82,9 +84,10 @@ jobs:
 
 To see examples of fully configured templates, see the `examples` directory:
 
-- [`node with npm`](examples/npm.yml)
-- [`node with pnpm`](examples/pnpm.yml)
-- [`python`](examples/python.yml)
+- [`node with npm`](examples/node/npm.yml)
+- [`node with pnpm`](examples/node/pnpm.yml)
+- [`python with pip`](examples/python/pip.yml)
+- [`python with uv`](examples/python/uv.yml)
 
 ## How it works
 

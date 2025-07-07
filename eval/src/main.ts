@@ -6,23 +6,53 @@ import { ExperimentSummary } from "braintrust";
 import { capitalize } from "@braintrust/core";
 import { z } from "zod";
 
-const paramsSchema = z.strictObject({
-  api_key: z.string(),
-  root: z.string(),
-  paths: z.string(),
-  runtime: z.enum(["node", "python"]),
-  use_proxy: z
-    .string()
-    .toLowerCase()
-    .transform(x => JSON.parse(x))
-    .pipe(z.boolean()),
-  terminate_on_failure: z
-    .string()
-    .toLowerCase()
-    .transform(x => JSON.parse(x))
-    .pipe(z.boolean())
-    .default("false"),
-});
+const nodeManagers = ["npm", "pnpm", "yarn"] as const;
+const pythonManagers = ["pip", "uv"] as const;
+
+const paramsSchema = z
+  .strictObject({
+    api_key: z.string(),
+    root: z.string(),
+    paths: z.string(),
+    runtime: z.enum(["node", "python"]),
+    package_manager: z
+      .enum([
+        ...([""] as const), // default
+        ...nodeManagers,
+        ...pythonManagers,
+      ])
+      .describe("The preferred package manager for the runtime selected")
+      .default(""),
+    use_proxy: z
+      .string()
+      .toLowerCase()
+      .transform(x => JSON.parse(x))
+      .pipe(z.boolean()),
+    terminate_on_failure: z
+      .string()
+      .toLowerCase()
+      .transform(x => JSON.parse(x))
+      .pipe(z.boolean())
+      .default("false"),
+  })
+  .refine(
+    data => {
+      if (data.package_manager === "") {
+        return true;
+      }
+      if (data.runtime === "node") {
+        return nodeManagers.includes(data.package_manager as any);
+      }
+      if (data.runtime === "python") {
+        return pythonManagers.includes(data.package_manager as any);
+      }
+      return false;
+    },
+    {
+      message: "Package manager must match the selected runtime",
+      path: ["package_manager"], // This will show the error on the package_manager field
+    },
+  );
 export type Params = z.infer<typeof paramsSchema>;
 
 const TITLE = "## Braintrust eval report\n";
@@ -37,6 +67,7 @@ async function main(): Promise<void> {
     root: core.getInput("root"),
     paths: core.getInput("paths"),
     runtime: core.getInput("runtime"),
+    package_manager: core.getInput("package_manager"),
     use_proxy: core.getInput("use_proxy"),
     terminate_on_failure: core.getInput("terminate_on_failure"),
   });

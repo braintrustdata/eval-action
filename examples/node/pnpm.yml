@@ -41,4 +41,5 @@ jobs:
         with:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           runtime: node
+          package_manager: pnpm
           root: my_eval_dir
