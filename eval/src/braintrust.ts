@@ -86,8 +86,6 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
           case "":
           case "npm":
             return "npx braintrust";
-          case "yarn":
-            return "yarn dlx braintrust";
           case "pnpm":
             return "pnpm dlx braintrust";
           default:

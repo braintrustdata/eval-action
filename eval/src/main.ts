@@ -6,7 +6,7 @@ import { ExperimentSummary } from "braintrust";
 import { capitalize } from "@braintrust/core";
 import { z } from "zod";
 
-const nodeManagers = ["npm", "pnpm", "yarn"];
+const nodeManagers = ["npm", "pnpm"];
 const pythonManagers = ["pip", "uv"];
 
 const paramsSchema = z
