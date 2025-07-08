@@ -16,11 +16,7 @@ const paramsSchema = z
     paths: z.string(),
     runtime: z.enum(["node", "python"]),
     package_manager: z
-      .enum([
-        "",
-        ...nodeManagers,
-        ...pythonManagers,
-      ])
+      .enum(["", ...nodeManagers, ...pythonManagers])
       .describe("The preferred package manager for the runtime selected")
       .default(""),
     use_proxy: z
