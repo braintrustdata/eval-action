@@ -1,0 +1,4 @@
+[tools]
+node = "20.6.0"
+pnpm = "8"
+python = "latest"

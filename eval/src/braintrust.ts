@@ -17,6 +17,7 @@ function snakeToCamelCase(str: string) {
 }
 
 async function runCommand(command: string, onSummary: OnSummaryFn) {
+  core.info(`> $ ${command}`);
   return new Promise((resolve, reject) => {
     const process = execSync(command);
 
@@ -76,18 +77,40 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   // Change working directory
   process.chdir(path.resolve(root));
 
-  let command: string;
   const terminateFlag = terminate_on_failure ? "--terminate-on-failure" : "";
 
-  switch (args.runtime) {
-    case "node":
-      command = `npx braintrust eval --jsonl ${terminateFlag} ${paths}`;
-      break;
-    case "python":
-      command = `braintrust eval --jsonl ${terminateFlag} ${paths}`;
-      break;
-    default:
-      throw new Error(`Unsupported runtime: ${args.runtime}`);
-  }
+  const baseCommand = (() => {
+    switch (args.runtime.toLowerCase().trim()) {
+      case "node":
+        switch (args.package_manager) {
+          case "":
+          case "npm":
+            return "npx braintrust";
+          case "pnpm":
+            return "pnpm dlx braintrust";
+          default:
+            throw new Error(
+              `Unsupported package manager: ${args.package_manager}`,
+            );
+        }
+      case "python":
+        switch ((args.package_manager || "").toLowerCase().trim()) {
+          case "":
+          case "pip":
+            return `braintrust`;
+          case "uv":
+            return `uv run braintrust`;
+          default:
+            throw new Error(
+              `Unsupported package manager: ${args.package_manager}`,
+            );
+        }
+      default:
+        throw new Error(`Unsupported runtime: ${args.runtime}`);
+    }
+  })();
+
+  const command = `${baseCommand} eval --jsonl ${terminateFlag} ${paths}`;
+
   await runCommand(command, onSummary);
 }
