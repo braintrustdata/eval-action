@@ -21,4 +21,4 @@ rpds-py==0.20.0
 smmap==5.0.1
 sseclient-py==1.8.0
 tqdm==4.66.5
-urllib3==2.2.3
+urllib3==2.5.0
