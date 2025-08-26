@@ -18,11 +18,11 @@ importers:
         specifier: ^1.10.1
         version: 1.11.1
       '@actions/github':
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: ^6.0.1
+        version: 6.0.1
       '@braintrust/core':
-        specifier: ^0.0.34
-        version: 0.0.34
+        specifier: ^0.0.94
+        version: 0.0.94
       braintrust:
         specifier: ^0.0.124
         version: 0.0.124
@@ -110,13 +110,16 @@ packages:
       '@actions/io': 1.1.3
     dev: false
 
-  /@actions/github@6.0.0:
-    resolution: {integrity: sha512-alScpSVnYmjNEXboZjarjukQEzgCRmjMv6Xj47fsdnqGS73bjJNDpiiXmp8jr0UZLdUB6d9jW63IcmddUP+l0g==}
+  /@actions/github@6.0.1:
+    resolution: {integrity: sha512-xbZVcaqD4XnQAe35qSQqskb3SqIAfRyLBrHMd/8TuL7hJSz2QtbDwnNM8zWx4zO5l2fnGtseNE3MbEvD7BxVMw==}
     dependencies:
       '@actions/http-client': 2.2.3
-      '@octokit/core': 5.2.1
-      '@octokit/plugin-paginate-rest': 9.2.2(@octokit/core@5.2.1)
-      '@octokit/plugin-rest-endpoint-methods': 10.4.1(@octokit/core@5.2.1)
+      '@octokit/core': 5.2.2
+      '@octokit/plugin-paginate-rest': 9.2.2(@octokit/core@5.2.2)
+      '@octokit/plugin-rest-endpoint-methods': 10.4.1(@octokit/core@5.2.2)
+      '@octokit/request': 8.4.1
+      '@octokit/request-error': 5.1.1
+      undici: 5.29.0
     dev: false
 
   /@actions/http-client@2.2.3:
@@ -145,13 +148,13 @@ packages:
       '@jridgewell/trace-mapping': 0.3.25
     dev: true
 
-  /@asteasolutions/zod-to-openapi@6.4.0(zod@3.24.3):
+  /@asteasolutions/zod-to-openapi@6.4.0(zod@3.25.76):
     resolution: {integrity: sha512-8cxfF7AHHx2PqnN4Cd8/O8CBu/nVYJP9DpnfVLW3BFb66VJDnqI/CczZnkqMc3SNh6J9GiX7JbJ5T4BSP4HZ2Q==}
     peerDependencies:
       zod: ^3.20.2
     dependencies:
-      openapi3-ts: 4.4.0
-      zod: 3.24.3
+      openapi3-ts: 4.5.0
+      zod: 3.25.76
     dev: false
 
   /@babel/code-frame@7.26.2:
@@ -471,9 +474,17 @@ packages:
   /@braintrust/core@0.0.34:
     resolution: {integrity: sha512-FwlBlQXDASNtCJa4VL+9roYax7W+yeK4YrpMK/D0G5gMy4vQF6MtPnkJnHVI6S1IdLa+TFBOqfzQJiKZyukhVQ==}
     dependencies:
-      '@asteasolutions/zod-to-openapi': 6.4.0(zod@3.24.3)
+      '@asteasolutions/zod-to-openapi': 6.4.0(zod@3.25.76)
       uuid: 9.0.1
-      zod: 3.24.3
+      zod: 3.25.76
+    dev: false
+
+  /@braintrust/core@0.0.94:
+    resolution: {integrity: sha512-ETNwGfPbnH3zzLL6YL8OMkdYpRfJ02ckALH2Ca/MJyCw4tLYNrw19QNflQb5MB79TYXfDqAJeNP1mxQE6tsuqA==}
+    dependencies:
+      '@asteasolutions/zod-to-openapi': 6.4.0(zod@3.25.76)
+      uuid: 9.0.1
+      zod: 3.25.76
     dev: false
 
   /@esbuild/aix-ppc64@0.25.3:
@@ -1265,8 +1276,8 @@ packages:
     engines: {node: '>= 18'}
     dev: false
 
-  /@octokit/core@5.2.1:
-    resolution: {integrity: sha512-dKYCMuPO1bmrpuogcjQ8z7ICCH3FP6WmxpwC03yjzGfZhj9fTJg6+bS1+UAplekbN2C+M61UNllGOOoAfGCrdQ==}
+  /@octokit/core@5.2.2:
+    resolution: {integrity: sha512-/g2d4sW9nUDJOMz3mabVQvOGhVa4e/BN/Um7yca9Bb2XTzPPnfTWHWQg+IsEYO7M3Vx+EXvaM/I2pJWIMun1bg==}
     engines: {node: '>= 18'}
     dependencies:
       '@octokit/auth-token': 4.0.0
@@ -1303,23 +1314,23 @@ packages:
     resolution: {integrity: sha512-9sIH3nSUttelJSXUrmGzl7QUBFul0/mB8HRYl3fOlgHbIWG+WnYDXU3v/2zMtAvuzZ/ed00Ei6on975FhBfzrg==}
     dev: false
 
-  /@octokit/plugin-paginate-rest@9.2.2(@octokit/core@5.2.1):
+  /@octokit/plugin-paginate-rest@9.2.2(@octokit/core@5.2.2):
     resolution: {integrity: sha512-u3KYkGF7GcZnSD/3UP0S7K5XUFT2FkOQdcfXZGZQPGv3lm4F2Xbf71lvjldr8c1H3nNbF+33cLEkWYbokGWqiQ==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '5'
     dependencies:
-      '@octokit/core': 5.2.1
+      '@octokit/core': 5.2.2
       '@octokit/types': 12.6.0
     dev: false
 
-  /@octokit/plugin-rest-endpoint-methods@10.4.1(@octokit/core@5.2.1):
+  /@octokit/plugin-rest-endpoint-methods@10.4.1(@octokit/core@5.2.2):
     resolution: {integrity: sha512-xV1b+ceKV9KytQe3zCVqjg+8GTGfDYwaT1ATU5isiUyVtlVAO3HNdzpS4sr4GBx4hxQ46s7ITtZrAsxG22+rVg==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '5'
     dependencies:
-      '@octokit/core': 5.2.1
+      '@octokit/core': 5.2.2
       '@octokit/types': 12.6.0
     dev: false
 
@@ -4621,10 +4632,10 @@ packages:
       - encoding
     dev: false
 
-  /openapi3-ts@4.4.0:
-    resolution: {integrity: sha512-9asTNB9IkKEzWMcHmVZE7Ts3kC9G7AFHfs8i7caD8HbI76gEjdkId4z/AkP83xdZsH7PLAnnbl47qZkXuxpArw==}
+  /openapi3-ts@4.5.0:
+    resolution: {integrity: sha512-jaL+HgTq2Gj5jRcfdutgRGLosCy/hT8sQf6VOy+P+g36cZOjI1iukdPnijC+4CmeRzg/jEllJUboEic2FhxhtQ==}
     dependencies:
-      yaml: 2.7.1
+      yaml: 2.8.1
     dev: false
 
   /optionator@0.9.4:
@@ -5669,9 +5680,9 @@ packages:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
     dev: true
 
-  /yaml@2.7.1:
-    resolution: {integrity: sha512-10ULxpnOCQXxJvBgxsn9ptjq6uviG/htZKk9veJGhlqn3w/DxQ631zFF+nlQXLwmImeS5amR2dl2U8sg6U9jsQ==}
-    engines: {node: '>= 14'}
+  /yaml@2.8.1:
+    resolution: {integrity: sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw==}
+    engines: {node: '>= 14.6'}
     hasBin: true
     dev: false
 
