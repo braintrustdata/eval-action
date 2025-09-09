@@ -1,6 +1,6 @@
 import path from "path";
 import * as core from "@actions/core";
-import { exec as execSync } from "child_process";
+import { spawn } from "child_process";
 
 import { Params } from "./main";
 import { ExperimentSummary } from "braintrust";
@@ -19,7 +19,7 @@ function snakeToCamelCase(str: string) {
 async function runCommand(command: string, onSummary: OnSummaryFn) {
   core.info(`> $ ${command}`);
   return new Promise((resolve, reject) => {
-    const process = execSync(command);
+    const process = spawn(command, { shell: true });
 
     process.stdout?.on("data", (text: string) => {
       onSummary(
