@@ -21,9 +21,10 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
   return new Promise((resolve, reject) => {
     const process = spawn(command, { shell: true });
 
-    process.stdout?.on("data", (text: string) => {
+    process.stdout?.on("data", (data: Buffer) => {
       onSummary(
-        text
+        data
+          .toString()
           .split("\n")
           .map(line => line.trim())
           .filter(line => line.length > 0)
@@ -46,8 +47,8 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
       );
     });
 
-    process.stderr?.on("data", data => {
-      core.info(data); // Outputs the stderr of the command
+    process.stderr?.on("data", (data: Buffer) => {
+      core.info(data.toString()); // Outputs the stderr of the command
     });
 
     process.on("close", code => {
