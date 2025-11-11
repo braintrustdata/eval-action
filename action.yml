@@ -51,6 +51,12 @@ inputs:
       what you're doing."
     required: true
     default: ${{ github.workflow_ref }}-${{ github.action }}
+  slack_webhook_url:
+    description:
+      "Slack webhook URL for posting evaluation results. If not provided, Slack
+      notifications will be skipped."
+    required: false
+    default: ""
 
 runs:
   using: node20

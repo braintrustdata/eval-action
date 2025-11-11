@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 
 import { upsertComment } from "./comment";
+import { postToSlack } from "./slack";
 import { ExperimentFailure, runEval } from "./braintrust";
 import { ExperimentSummary } from "braintrust";
 import { capitalize } from "@braintrust/core";
@@ -73,14 +74,20 @@ async function main(): Promise<void> {
     );
   }
 
-  await upsertComment(`${TITLE}Evals in progress... ⌛`);
+  await Promise.all([
+    upsertComment(`${TITLE}Evals in progress... ⌛`),
+    postToSlack([], "in_progress"),
+  ]);
 
   try {
     await runEval(args.data, onSummary);
     await runUpdateComments(true);
   } catch (error) {
     core.error(`Eval command failed: ${error}`);
-    await upsertComment(`${TITLE}Evals failed: ${error}`);
+    await Promise.all([
+      upsertComment(`${TITLE}Evals failed: ${error}`),
+      postToSlack(allSummaries, "failed"),
+    ]);
     throw error;
   } finally {
     await currentUpdate;
@@ -146,7 +153,10 @@ ${errors}
         (summaryTables.length > 0
           ? summaryTables.join("\n\n")
           : "No experiments to report");
-      await upsertComment(comment);
+      await Promise.all([
+        upsertComment(comment),
+        postToSlack(allSummaries, "completed"),
+      ]);
       queuedUpdates -= 1;
     }
   })();
