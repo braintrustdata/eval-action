@@ -74,10 +74,7 @@ async function main(): Promise<void> {
     );
   }
 
-  await Promise.all([
-    upsertComment(`${TITLE}Evals in progress... ⌛`),
-    postToSlack([], "in_progress"),
-  ]);
+  await upsertComment(`${TITLE}Evals in progress... ⌛`);
 
   try {
     await runEval(args.data, onSummary);
