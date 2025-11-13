@@ -153,11 +153,13 @@ ${errors}
         (summaryTables.length > 0
           ? summaryTables.join("\n\n")
           : "No experiments to report");
-      await Promise.all([
-        upsertComment(comment),
-        postToSlack(allSummaries, "completed"),
-      ]);
+      await upsertComment(comment);
       queuedUpdates -= 1;
+    }
+
+    // Only post to Slack once at the end, not for every queued update
+    if (mustRun) {
+      await postToSlack(allSummaries, "completed");
     }
   })();
   await currentUpdate;
