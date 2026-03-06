@@ -137,7 +137,7 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   process.chdir(path.resolve(root));
 
   // Build bt eval flags
-  const flags: string[] = ["--jsonl", "--verbose"];
+  const flags: string[] = ["--jsonl"];
 
   if (terminate_on_failure) {
     flags.push("--terminate-on-failure");
