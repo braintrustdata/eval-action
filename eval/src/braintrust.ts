@@ -149,8 +149,6 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
     flags.push(`--runner ${args.runner}`);
   } else if (args.runtime === "python") {
     flags.push("--language python");
-  } else if (args.runtime === "node") {
-    flags.push("--language js");
   }
 
   if (args.filter) {

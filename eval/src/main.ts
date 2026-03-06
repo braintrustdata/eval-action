@@ -65,7 +65,7 @@ async function main(): Promise<void> {
     await runUpdateComments(true);
   } catch (error) {
     core.error(`Eval command failed: ${error}`);
-    await upsertComment(`${TITLE}Evals failed: ${error}`);
+    await runUpdateComments(true);
     throw error;
   } finally {
     await currentUpdate;
