@@ -51,11 +51,11 @@ async function installBt(version: string): Promise<void> {
 
   let installCmd: string;
   if (isCanary) {
-    installCmd = `curl -fsSL https://github.com/braintrustdata/bt/releases/download/${version}/bt-installer.sh | sh`;
+    installCmd = `curl -fsSL https://github.com/braintrustdata/bt/releases/download/${version}/bt-installer.sh | bash`;
   } else if (version !== "") {
-    installCmd = `curl -fsSL https://bt.dev/cli/install.sh | sh -s -- --version ${version}`;
+    installCmd = `curl -fsSL https://bt.dev/cli/install.sh | bash -s -- --version ${version}`;
   } else {
-    installCmd = `curl -fsSL https://bt.dev/cli/install.sh | sh`;
+    installCmd = `curl -fsSL https://bt.dev/cli/install.sh | bash`;
   }
 
   core.info(`Installing bt CLI: ${installCmd}`);
