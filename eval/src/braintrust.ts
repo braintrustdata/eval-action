@@ -134,7 +134,11 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   await installBt(args.bt_version);
 
+  core.info(`cwd before chdir: ${process.cwd()}`);
+  core.info(`resolving root '${root}' → ${path.resolve(root)}`);
   process.chdir(path.resolve(root));
+  core.info(`cwd after chdir: ${process.cwd()}`);
+  await runCommand("bt --version && ls -la", () => {});
 
   // Build bt eval flags
   const flags: string[] = ["--jsonl", "--verbose"];
@@ -156,6 +160,7 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   }
 
   const command = `bt eval ${flags.join(" ")} ${paths}`;
+  core.info(`running: ${command}`);
 
   try {
     await runCommand(command, onSummary);
