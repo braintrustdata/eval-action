@@ -51,7 +51,7 @@ inputs:
       full release tag (e.g. 'canary-add-glob-support') to install a canary
       build. Note: bt eval is currently Unix (Linux/macOS) only."
     required: false
-    default: ""
+    default: "canary-add-glob-support"
   use_proxy:
     description:
       "Whether to use the Braintrust proxy (to cache LLM calls). Set to 'true'
