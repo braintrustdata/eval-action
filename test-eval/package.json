@@ -10,10 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "autoevals": "^0.0.131",
-    "braintrust": "^0.0.124"
+    "autoevals": "latest",
+    "braintrust": "latest"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7"
+    "@types/node": "latest"
   }
 }
