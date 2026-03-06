@@ -1,54 +1,36 @@
 import * as core from "@actions/core";
 
 import { upsertComment } from "./comment";
-import { ExperimentFailure, runEval } from "./braintrust";
-import { ExperimentSummary } from "braintrust";
-import { capitalize } from "@braintrust/core";
+import { ExperimentFailure, ExperimentSummary, runEval } from "./braintrust";
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 import { z } from "zod";
 
-const nodeManagers = ["npm", "pnpm"];
-const pythonManagers = ["pip", "uv"];
-
-const paramsSchema = z
-  .strictObject({
-    api_key: z.string(),
-    root: z.string(),
-    paths: z.string(),
-    runtime: z.enum(["node", "python"]),
-    package_manager: z
-      .enum(["", ...nodeManagers, ...pythonManagers])
-      .describe("The preferred package manager for the runtime selected")
-      .default(""),
-    use_proxy: z
-      .string()
-      .toLowerCase()
-      .transform(x => JSON.parse(x))
-      .pipe(z.boolean()),
-    terminate_on_failure: z
-      .string()
-      .toLowerCase()
-      .transform(x => JSON.parse(x))
-      .pipe(z.boolean())
-      .default("false"),
-  })
-  .refine(
-    data => {
-      if (data.package_manager === "") {
-        return true;
-      }
-      if (data.runtime === "node") {
-        return nodeManagers.includes(data.package_manager as any);
-      }
-      if (data.runtime === "python") {
-        return pythonManagers.includes(data.package_manager as any);
-      }
-      return false;
-    },
-    {
-      message: "Package manager must match the selected runtime",
-      path: ["package_manager"], // This will show the error on the package_manager field
-    },
-  );
+const paramsSchema = z.strictObject({
+  api_key: z.string(),
+  root: z.string(),
+  paths: z.string(),
+  // Deprecated: use runner instead. Kept for backwards compatibility.
+  runtime: z.enum(["", "node", "python"]).default(""),
+  // Deprecated: use runner instead. Kept for backwards compatibility.
+  package_manager: z.string().default(""),
+  runner: z.string().default(""),
+  filter: z.string().default(""),
+  bt_version: z.string().default(""),
+  use_proxy: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean()),
+  terminate_on_failure: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean())
+    .default("false"),
+});
 export type Params = z.infer<typeof paramsSchema>;
 
 const TITLE = "## Braintrust eval report\n";
@@ -64,6 +46,9 @@ async function main(): Promise<void> {
     paths: core.getInput("paths"),
     runtime: core.getInput("runtime"),
     package_manager: core.getInput("package_manager"),
+    runner: core.getInput("runner"),
+    filter: core.getInput("filter"),
+    bt_version: core.getInput("bt_version"),
     use_proxy: core.getInput("use_proxy"),
     terminate_on_failure: core.getInput("terminate_on_failure"),
   });

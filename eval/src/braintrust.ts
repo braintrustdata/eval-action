@@ -1,9 +1,38 @@
+import os from "os";
 import path from "path";
 import * as core from "@actions/core";
 import { spawn } from "child_process";
 
 import { Params } from "./main";
-import { ExperimentSummary } from "braintrust";
+
+export interface ScoreSummary {
+  name: string;
+  score: number;
+  diff?: number;
+  improvements: number;
+  regressions: number;
+}
+
+export interface MetricSummary {
+  name: string;
+  metric: number;
+  unit: string;
+  diff?: number;
+  improvements: number;
+  regressions: number;
+}
+
+export interface ExperimentSummary {
+  projectName: string;
+  experimentName: string;
+  projectId?: string;
+  experimentId?: string;
+  projectUrl?: string;
+  experimentUrl?: string;
+  comparisonExperimentName?: string;
+  scores: Record<string, ScoreSummary>;
+  metrics?: Record<string, MetricSummary>;
+}
 
 export interface ExperimentFailure {
   evaluatorName: string;
@@ -12,50 +41,79 @@ export interface ExperimentFailure {
 
 type OnSummaryFn = (summary: (ExperimentSummary | ExperimentFailure)[]) => void;
 
-function snakeToCamelCase(str: string) {
-  return str.replace(/([-_][a-z])/g, group => group.charAt(1).toUpperCase());
+// Installs the bt CLI and adds its bin directory to PATH for the current
+// process. version may be:
+//   ""                       → latest stable via https://bt.dev/cli/install.sh
+//   semver like "0.2.0"      → pinned stable via the same script with --version
+//   release tag like "canary-add-glob-support" → canary installer from GH release
+async function installBt(version: string): Promise<void> {
+  const isCanary = version !== "" && !version.match(/^\d+\.\d+\.\d+/);
+
+  let installCmd: string;
+  if (isCanary) {
+    installCmd = `curl -fsSL https://github.com/braintrustdata/bt/releases/download/${version}/bt-installer.sh | sh`;
+  } else if (version !== "") {
+    installCmd = `curl -fsSL https://bt.dev/cli/install.sh | sh -s -- --version ${version}`;
+  } else {
+    installCmd = `curl -fsSL https://bt.dev/cli/install.sh | sh`;
+  }
+
+  core.info(`Installing bt CLI: ${installCmd}`);
+  await runCommand(installCmd, () => {});
+
+  // The installer puts the binary in ~/.local/bin (or $XDG_BIN_HOME).
+  // Make sure the spawned child processes can find it.
+  const localBin = path.join(os.homedir(), ".local", "bin");
+  const xdgBin = process.env.XDG_BIN_HOME ?? "";
+  for (const dir of [xdgBin, localBin]) {
+    if (dir && !process.env.PATH?.includes(dir)) {
+      process.env.PATH = `${dir}:${process.env.PATH}`;
+    }
+  }
 }
 
-async function runCommand(command: string, onSummary: OnSummaryFn) {
+async function runCommand(
+  command: string,
+  onSummary: OnSummaryFn,
+): Promise<string> {
   core.info(`> $ ${command}`);
   return new Promise((resolve, reject) => {
-    const process = spawn(command, { shell: true });
+    const stderrChunks: string[] = [];
 
-    process.stdout?.on("data", (data: Buffer) => {
-      onSummary(
-        data
-          .toString()
-          .split("\n")
-          .map(line => line.trim())
-          .filter(line => line.length > 0)
-          .flatMap(line => {
-            try {
-              const parsedLine = JSON.parse(line);
-              const camelCaseLine = Object.fromEntries(
-                Object.entries(parsedLine).map(([key, value]) => [
-                  snakeToCamelCase(key),
-                  value,
-                ]),
-              );
-              // TODO: This is hacky and we should be parsing what comes off the wire
-              return [camelCaseLine as unknown as ExperimentSummary];
-            } catch (e) {
-              core.error(`Failed to parse jsonl data: ${e}`);
-              return [];
-            }
-          }),
-      );
+    const child = spawn(command, { shell: true });
+
+    child.stdout?.on("data", (data: Buffer) => {
+      data
+        .toString()
+        .split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .forEach(line => {
+          try {
+            const parsed = JSON.parse(line) as ExperimentSummary;
+            onSummary([parsed]);
+          } catch (e) {
+            core.error(`Failed to parse jsonl data: ${e}`);
+          }
+        });
     });
 
-    process.stderr?.on("data", (data: Buffer) => {
-      core.info(data.toString()); // Outputs the stderr of the command
+    child.stderr?.on("data", (data: Buffer) => {
+      const text = data.toString();
+      stderrChunks.push(text);
+      core.info(text);
     });
 
-    process.on("close", code => {
+    child.on("close", code => {
       if (code === 0) {
-        resolve(null);
+        resolve(stderrChunks.join(""));
       } else {
-        reject(new Error(`Command failed with exit code ${code}`));
+        reject(
+          Object.assign(
+            new Error(`Command failed with exit code ${code}`),
+            { stderr: stderrChunks.join("") },
+          ),
+        );
       }
     });
   });
@@ -64,7 +122,6 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
 export async function runEval(args: Params, onSummary: OnSummaryFn) {
   const { api_key, root, paths, terminate_on_failure } = args;
 
-  // Add the API key to the environment
   core.exportVariable("BRAINTRUST_API_KEY", api_key);
 
   if (!process.env.OPENAI_API_KEY) {
@@ -75,43 +132,46 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
     core.exportVariable("OPENAI_BASE_URL", "https://braintrustproxy.com/v1");
   }
 
-  // Change working directory
+  await installBt(args.bt_version);
+
   process.chdir(path.resolve(root));
 
-  const terminateFlag = terminate_on_failure ? "--terminate-on-failure" : "";
+  // Build bt eval flags
+  const flags: string[] = ["--jsonl"];
 
-  const baseCommand = (() => {
-    switch (args.runtime.toLowerCase().trim()) {
-      case "node":
-        switch (args.package_manager) {
-          case "":
-          case "npm":
-            return "npx braintrust";
-          case "pnpm":
-            return "pnpm dlx braintrust";
-          default:
-            throw new Error(
-              `Unsupported package manager: ${args.package_manager}`,
-            );
-        }
-      case "python":
-        switch ((args.package_manager || "").toLowerCase().trim()) {
-          case "":
-          case "pip":
-            return `braintrust`;
-          case "uv":
-            return `uv run braintrust`;
-          default:
-            throw new Error(
-              `Unsupported package manager: ${args.package_manager}`,
-            );
-        }
-      default:
-        throw new Error(`Unsupported runtime: ${args.runtime}`);
+  if (terminate_on_failure) {
+    flags.push("--terminate-on-failure");
+  }
+
+  // --runner: explicit input takes precedence; fall back to deriving --language
+  // from the deprecated runtime input so existing configs keep working.
+  if (args.runner) {
+    flags.push(`--runner ${args.runner}`);
+  } else if (args.runtime === "python") {
+    flags.push("--language python");
+  } else if (args.runtime === "node") {
+    flags.push("--language js");
+  }
+
+  if (args.filter) {
+    flags.push(`--filter ${args.filter}`);
+  }
+
+  const command = `bt eval ${flags.join(" ")} ${paths}`;
+
+  try {
+    await runCommand(command, onSummary);
+  } catch (err: any) {
+    // Surface stderr as a structured failure so the PR comment can show details.
+    const stderr: string = err?.stderr ?? "";
+    if (stderr) {
+      onSummary([
+        {
+          evaluatorName: "eval",
+          errors: stderr.split("\n").filter((l: string) => l.trim()),
+        },
+      ]);
     }
-  })();
-
-  const command = `${baseCommand} eval --jsonl ${terminateFlag} ${paths}`;
-
-  await runCommand(command, onSummary);
+    throw err;
+  }
 }

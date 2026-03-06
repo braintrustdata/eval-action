@@ -21,12 +21,35 @@ inputs:
     required: false
     default: "."
   runtime:
-    description: "The runtime to use for evals. Valid values: node, python."
-    required: true
+    description:
+      "Deprecated. Use 'runner' instead. The runtime to use for evals. Valid
+      values: node, python."
+    required: false
+    default: ""
   package_manager:
     description:
-      "The package manager to use for evals. Valid values: npm, pnpm, yarn, pip,
-      or uv depending on the runtime."
+      "Deprecated. Use 'runner' instead. The package manager to use for evals."
+    required: false
+    default: ""
+  runner:
+    description:
+      "The eval runner binary to use (e.g. tsx, vite-node, ts-node, bun,
+      python3). When omitted, bt auto-detects from file extensions. Overrides
+      the deprecated 'runtime' and 'package_manager' inputs."
+    required: false
+    default: ""
+  filter:
+    description:
+      "Comma-separated filter expression(s) used to select which evaluators to
+      run."
+    required: false
+    default: ""
+  bt_version:
+    description:
+      "Version of the bt CLI to install. Leave empty for the latest stable
+      release. Pass a semver (e.g. '0.2.0') to pin a stable version. Pass a
+      full release tag (e.g. 'canary-add-glob-support') to install a canary
+      build. Note: bt eval is currently Unix (Linux/macOS) only."
     required: false
     default: ""
   use_proxy:
