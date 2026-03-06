@@ -63,9 +63,17 @@ async function main(): Promise<void> {
   try {
     await runEval(args.data, onSummary);
     await runUpdateComments(true);
-  } catch (error) {
+  } catch (error: any) {
     core.error(`Eval command failed: ${error}`);
-    await runUpdateComments(true);
+    if (allSummaries.length > 0) {
+      await runUpdateComments(true);
+    } else {
+      const stderr: string = error?.stderr ?? "";
+      const body = stderr.trim()
+        ? `<details><summary>Expand to see errors</summary>\n\n\`\`\`\n${stderr.trim()}\n\`\`\`\n\n</details>`
+        : String(error);
+      await upsertComment(`${TITLE}**‼️ Evals failed**\n\n${body}`);
+    }
     throw error;
   } finally {
     await currentUpdate;
