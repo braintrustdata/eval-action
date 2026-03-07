@@ -3,11 +3,11 @@
     "build": "turbo run build",
     "watch": "turbo run watch",
     "dev": "turbo run dev",
-    "start": "turbo run start"
-  },
-  "dependencies": {
+    "start": "turbo run start",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "turbo": "^1.11.2"
   }
 }

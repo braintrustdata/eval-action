@@ -1,0 +1,6 @@
+cd eval
+npm run format:check
+npm run lint
+npm run package
+cd ..
+git add eval/dist/
