@@ -83,19 +83,18 @@ async function runCommand(
     const child = spawn(command, { shell: true });
 
     child.stdout?.on("data", (data: Buffer) => {
-      data
+      for (const line of data
         .toString()
         .split("\n")
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-        .forEach(line => {
-          try {
-            const parsed = JSON.parse(line) as ExperimentSummary;
-            onSummary([parsed]);
-          } catch {
-            core.info(line);
-          }
-        });
+        .map(l => l.trim())
+        .filter(l => l.length > 0)) {
+        try {
+          const parsed = JSON.parse(line) as ExperimentSummary;
+          onSummary([parsed]);
+        } catch {
+          core.info(line);
+        }
+      }
     });
 
     child.stderr?.on("data", (data: Buffer) => {

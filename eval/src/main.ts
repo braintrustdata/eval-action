@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import { z } from "zod";
 
 import { upsertComment } from "./comment";
 import { ExperimentFailure, ExperimentSummary, runEval } from "./braintrust";
@@ -6,7 +7,6 @@ import { ExperimentFailure, ExperimentSummary, runEval } from "./braintrust";
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
-import { z } from "zod";
 
 const paramsSchema = z.strictObject({
   api_key: z.string(),

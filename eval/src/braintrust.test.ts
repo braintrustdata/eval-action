@@ -46,18 +46,17 @@ describe("braintrust Buffer handling", () => {
       const process = spawn("printf", [`'${jsonString}\\n'`], { shell: true });
 
       process.stdout?.on("data", (data: Buffer) => {
-        const text = data.toString();
-        text
+        for (const line of data
+          .toString()
           .split("\n")
-          .map(line => line.trim())
-          .filter(line => line.length > 0)
-          .forEach(line => {
-            try {
-              parsed.push(JSON.parse(line));
-            } catch (e) {
-              // Skip non-JSON lines
-            }
-          });
+          .map(l => l.trim())
+          .filter(l => l.length > 0)) {
+          try {
+            parsed.push(JSON.parse(line));
+          } catch {
+            // Skip non-JSON lines
+          }
+        }
       });
 
       process.on("close", code => {
@@ -74,7 +73,7 @@ describe("braintrust Buffer handling", () => {
   });
 
   it("should handle stderr as Buffer", async () => {
-    const stderrOutput = await new Promise<string>((resolve, reject) => {
+    const stderrOutput = await new Promise<string>(resolve => {
       let error = "";
       // Command that writes to stderr
       const process = spawn("sh", ["-c", "echo 'error message' >&2"], {
