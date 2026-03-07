@@ -92,8 +92,8 @@ async function runCommand(
           try {
             const parsed = JSON.parse(line) as ExperimentSummary;
             onSummary([parsed]);
-          } catch (e) {
-            core.error(`Failed to parse jsonl data: ${e}`);
+          } catch {
+            core.info(line);
           }
         });
     });
@@ -109,10 +109,9 @@ async function runCommand(
         resolve(stderrChunks.join(""));
       } else {
         reject(
-          Object.assign(
-            new Error(`Command failed with exit code ${code}`),
-            { stderr: stderrChunks.join("") },
-          ),
+          Object.assign(new Error(`Command failed with exit code ${code}`), {
+            stderr: stderrChunks.join(""),
+          }),
         );
       }
     });
@@ -134,11 +133,7 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   await installBt(args.bt_version);
 
-  core.info(`cwd before chdir: ${process.cwd()}`);
-  core.info(`resolving root '${root}' → ${path.resolve(root)}`);
   process.chdir(path.resolve(root));
-  core.info(`cwd after chdir: ${process.cwd()}`);
-  await runCommand("bt --version && ls -la", () => {});
 
   // Build bt eval flags
   const flags: string[] = ["--jsonl", "--verbose"];
