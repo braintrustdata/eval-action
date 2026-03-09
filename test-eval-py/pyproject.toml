@@ -6,5 +6,5 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "autoevals>=0.0.92",
-    "braintrust>=0.0.160",
+    "braintrust>=0.8.0",
 ]

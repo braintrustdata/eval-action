@@ -134,6 +134,18 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   process.chdir(path.resolve(root));
 
+  await runCommand("bt --version", () => {});
+
+  // Ensure Python output is not buffered so bt captures it in real time.
+  process.env.PYTHONUNBUFFERED = "1";
+
+  if (args.runtime === "python" || args.runner?.includes("python")) {
+    await runCommand(
+      "python3 -c \"import sys; print('python:', sys.executable, sys.version)\"",
+      () => {},
+    );
+  }
+
   // Build bt eval flags
   const flags: string[] = ["--jsonl", "--verbose"];
 
