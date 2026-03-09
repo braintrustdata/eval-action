@@ -35,6 +35,8 @@ jobs:
           cd test-eval-py
           uv lock --check
           uv sync --no-dev
+          echo "VIRTUAL_ENV=$(pwd)/.venv" >> $GITHUB_ENV
+          echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
 
       - name: Run Evals
         uses: ./
