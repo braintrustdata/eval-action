@@ -30,6 +30,35 @@ const paramsSchema = z.strictObject({
     .transform(x => JSON.parse(x))
     .pipe(z.boolean())
     .default("false"),
+  verbose: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean())
+    .default("false"),
+  no_send_logs: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean())
+    .default("false"),
+  no_color: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean())
+    .default("false"),
+  quiet: z
+    .string()
+    .toLowerCase()
+    .transform(x => JSON.parse(x))
+    .pipe(z.boolean())
+    .default("false"),
+  num_workers: z.string().default(""),
+  project: z.string().default(""),
+  org: z.string().default(""),
+  api_url: z.string().default(""),
+  app_url: z.string().default(""),
 });
 export type Params = z.infer<typeof paramsSchema>;
 
@@ -51,6 +80,15 @@ async function main(): Promise<void> {
     bt_version: core.getInput("bt_version"),
     use_proxy: core.getInput("use_proxy"),
     terminate_on_failure: core.getInput("terminate_on_failure"),
+    verbose: core.getInput("verbose"),
+    no_send_logs: core.getInput("no_send_logs"),
+    no_color: core.getInput("no_color"),
+    quiet: core.getInput("quiet"),
+    num_workers: core.getInput("num_workers"),
+    project: core.getInput("project"),
+    org: core.getInput("org"),
+    api_url: core.getInput("api_url"),
+    app_url: core.getInput("app_url"),
   });
   if (!args.success) {
     throw new Error(

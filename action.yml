@@ -47,9 +47,9 @@ inputs:
   bt_version:
     description:
       "Version of the bt CLI to install. Leave empty for the latest stable
-      release. Pass a semver (e.g. '0.2.0') to pin a stable version. Pass a
-      full release tag (e.g. 'canary-add-glob-support') to install a canary
-      build. Note: bt eval is currently Unix (Linux/macOS) only."
+      release. Pass a semver (e.g. '0.2.0') to pin a stable version. Pass a full
+      release tag (e.g. 'canary-add-glob-support') to install a canary build.
+      Note: bt eval is currently Unix (Linux/macOS) only."
     required: false
     default: ""
   use_proxy:
@@ -62,6 +62,51 @@ inputs:
     description:
       "Whether to terminate the evaluation process when an error occurs. Set to
       'true' or 'false'."
+    required: false
+    default: "false"
+  verbose:
+    description:
+      "Show verbose evaluator errors and stderr output. Set to 'true' or
+      'false'."
+    required: false
+    default: "false"
+  no_send_logs:
+    description:
+      "Run evals locally without sending logs to Braintrust. Set to 'true' or
+      'false'."
+    required: false
+    default: "false"
+  num_workers:
+    description:
+      "Number of worker threads for Python eval execution. Leave empty to use
+      the bt default."
+    required: false
+    default: ""
+  project:
+    description: "Override the active Braintrust project name."
+    required: false
+    default: ""
+  org:
+    description: "Override the active Braintrust organization name."
+    required: false
+    default: ""
+  api_url:
+    description:
+      "Override the Braintrust API URL (e.g. for self-hosted deployments)."
+    required: false
+    default: ""
+  app_url:
+    description:
+      "Override the Braintrust app URL (e.g. for self-hosted deployments)."
+    required: false
+    default: ""
+  no_color:
+    description: "Disable ANSI color output from bt. Set to 'true' or 'false'."
+    required: false
+    default: "false"
+  quiet:
+    description:
+      "Suppress non-essential output from bt. Set to 'true' or 'false'."
     required: false
     default: "false"
   github_token:

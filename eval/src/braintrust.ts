@@ -147,10 +147,26 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   }
 
   // Build bt eval flags
-  const flags: string[] = ["--jsonl", "--verbose"];
+  const flags: string[] = ["--jsonl"];
+
+  if (args.verbose) {
+    flags.push("--verbose");
+  }
+
+  if (args.quiet) {
+    flags.push("--quiet");
+  }
+
+  if (args.no_color) {
+    flags.push("--no-color");
+  }
 
   if (terminate_on_failure) {
     flags.push("--terminate-on-failure");
+  }
+
+  if (args.no_send_logs) {
+    flags.push("--no-send-logs");
   }
 
   // --runner: explicit input takes precedence; fall back to deriving --language
@@ -163,6 +179,26 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   if (args.filter) {
     flags.push(`--filter ${args.filter}`);
+  }
+
+  if (args.num_workers) {
+    flags.push(`--num-workers ${args.num_workers}`);
+  }
+
+  if (args.project) {
+    flags.push(`--project ${args.project}`);
+  }
+
+  if (args.org) {
+    flags.push(`--org ${args.org}`);
+  }
+
+  if (args.api_url) {
+    flags.push(`--api-url ${args.api_url}`);
+  }
+
+  if (args.app_url) {
+    flags.push(`--app-url ${args.app_url}`);
   }
 
   const command = `bt eval ${flags.join(" ")} ${paths}`;
