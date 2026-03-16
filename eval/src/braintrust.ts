@@ -79,6 +79,26 @@ async function runCommand(
   core.info(`> $ ${command}`);
   return new Promise((resolve, reject) => {
     const stderrChunks: string[] = [];
+    const stdoutLines: string[] = [];
+    let exitCode: number | null = null;
+    let stdoutDone = false;
+    let stderrDone = false;
+
+    function trySettle() {
+      if (exitCode === null || !stdoutDone || !stderrDone) return;
+      if (exitCode === 0) {
+        resolve(stderrChunks.join(""));
+      } else {
+        reject(
+          Object.assign(
+            new Error(`Command failed with exit code ${exitCode}`),
+            {
+              stderr: [...stdoutLines, ...stderrChunks].join("\n"),
+            },
+          ),
+        );
+      }
+    }
 
     const child = spawn(command, { shell: true });
 
@@ -93,8 +113,13 @@ async function runCommand(
           onSummary([parsed]);
         } catch {
           core.info(line);
+          stdoutLines.push(line);
         }
       }
+    });
+    child.stdout?.on("end", () => {
+      stdoutDone = true;
+      trySettle();
     });
 
     child.stderr?.on("data", (data: Buffer) => {
@@ -102,17 +127,14 @@ async function runCommand(
       stderrChunks.push(text);
       core.info(text);
     });
+    child.stderr?.on("end", () => {
+      stderrDone = true;
+      trySettle();
+    });
 
     child.on("close", code => {
-      if (code === 0) {
-        resolve(stderrChunks.join(""));
-      } else {
-        reject(
-          Object.assign(new Error(`Command failed with exit code ${code}`), {
-            stderr: stderrChunks.join(""),
-          }),
-        );
-      }
+      exitCode = code ?? 1;
+      trySettle();
     });
   });
 }
