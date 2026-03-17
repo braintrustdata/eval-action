@@ -13,11 +13,21 @@ type PullRequest = {
 
 export async function upsertComment(text: string) {
   const githubToken = core.getInput("github_token");
-  const octokit = github.getOctokit(githubToken);
 
-  const prs = await inferPullRequestsFromContext(octokit);
+  // When running locally with `act`, skip the GitHub API call and log to
+  // console instead. `act` sets the ACT env variable.
+  if (!githubToken || process.env.ACT) {
+    core.info(`[PR Comment]\n${text}`);
+    return;
+  }
 
-  await Promise.all(prs.map(pr => createOrUpdateComment(octokit, pr, text)));
+  try {
+    const octokit = github.getOctokit(githubToken);
+    const prs = await inferPullRequestsFromContext(octokit);
+    await Promise.all(prs.map(pr => createOrUpdateComment(octokit, pr, text)));
+  } catch (err) {
+    core.info(`[PR Comment (GitHub API unavailable: ${err})]\n${text}`);
+  }
 }
 
 const createOrUpdateComment = async (

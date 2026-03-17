@@ -1,3 +1,4 @@
+import fs from "fs";
 import os from "os";
 import path from "path";
 import * as core from "@actions/core";
@@ -155,6 +156,16 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   await installBt(args.bt_version);
 
   process.chdir(path.resolve(root));
+
+  // When using uv as the package manager, point bt at the venv Python so it
+  // uses the project's installed packages rather than whatever python3 is
+  // first in PATH (which may be a different version or lack the deps).
+  if (args.package_manager === "uv" && !process.env.VIRTUAL_ENV) {
+    const venvPython = path.join(".venv", "bin", "python");
+    if (fs.existsSync(venvPython)) {
+      process.env.VIRTUAL_ENV = path.resolve(".venv");
+    }
+  }
 
   await runCommand("bt --version", () => {});
 
