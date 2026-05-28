@@ -157,13 +157,21 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
 
   process.chdir(path.resolve(root));
 
-  // When using uv as the package manager, point bt at the venv Python so it
-  // uses the project's installed packages rather than whatever python3 is
-  // first in PATH (which may be a different version or lack the deps).
-  if (args.package_manager === "uv" && !process.env.VIRTUAL_ENV) {
-    const venvPython = path.join(".venv", "bin", "python");
-    if (fs.existsSync(venvPython)) {
-      process.env.VIRTUAL_ENV = path.resolve(".venv");
+  // If VIRTUAL_ENV isn't already set, scan the root and each path entry for a
+  // .venv so bt uses the project's installed packages rather than whatever
+  // python3 is first in PATH (which may lack the deps or be the wrong version).
+  // This covers both python-only (root/.venv) and mixed eval (subdir/.venv).
+  if (!process.env.VIRTUAL_ENV) {
+    const candidates = [".", ...args.paths.split(/\s+/).filter(Boolean)];
+    for (const candidate of candidates) {
+      if (!fs.statSync(candidate, { throwIfNoEntry: false })?.isDirectory()) {
+        continue;
+      }
+      const venvPython = path.join(candidate, ".venv", "bin", "python");
+      if (fs.existsSync(venvPython)) {
+        process.env.VIRTUAL_ENV = path.resolve(candidate, ".venv");
+        break;
+      }
     }
   }
 
