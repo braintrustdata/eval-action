@@ -71,7 +71,7 @@
     "@actions/github": "^6.0.0",
     "@braintrust/core": "^0.0.34",
     "braintrust": "^0.0.124",
-    "zod": "^3.23.4"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
