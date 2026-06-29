@@ -3,7 +3,7 @@ import * as core from "@actions/core";
 import { spawn } from "child_process";
 
 import { Params } from "./main";
-import { ExperimentSummary } from "braintrust";
+import type { ExperimentSummary } from "braintrust";
 
 export interface ExperimentFailure {
   evaluatorName: string;
