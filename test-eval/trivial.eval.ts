@@ -41,7 +41,7 @@ Eval("My Evaluation", {
   data: () => [
     { input: "Which country has the highest population?", expected: "China" },
   ],
-  task: async (input, { span }) => {
+  task: async input => {
     await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
     return await callModel(input);
   },

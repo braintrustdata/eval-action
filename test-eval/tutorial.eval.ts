@@ -11,7 +11,7 @@ Eval("Say Hi Bot", {
   data: () => data,
   task: async input => {
     await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate a long-running task
-    return `Hi Foo${Math.floor(Math.random() * NUM_EXAMPLES)}`; // Replace with your LLM call
+    return `Hi ${input}`; // Replace with your LLM call
   },
   scores: [LevenshteinScorer],
 });

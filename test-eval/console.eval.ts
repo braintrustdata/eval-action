@@ -13,7 +13,7 @@ Eval("Console logging", {
     // Uncomment to break the eval via spurious console logs
     // console.log("distracting text");
     // console.log(JSON.stringify({ input }));
-    return `Hi Foo${Math.floor(Math.random() * NUM_EXAMPLES)}`; // Replace with your LLM call
+    return `Hi ${input}`; // Replace with your LLM call
   },
   scores: [LevenshteinScorer],
 });

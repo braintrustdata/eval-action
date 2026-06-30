@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   test-typescript:
-    name: TypeScript Tests
+    name: TypeScript Checks
     runs-on: ubuntu-latest
 
     steps:
@@ -45,14 +45,11 @@ jobs:
       - name: Install Dependencies
         id: install
         run: pnpm install
-        working-directory: eval
 
-      - name: Check Format
-        id: npm-format-check
-        run: npm run format:check
-        working-directory: eval
+      - name: Check
+        id: check
+        run: pnpm exec vp check
 
-      - name: Lint
-        id: npm-lint
-        run: npm run lint
-        working-directory: eval
+      - name: Test
+        id: test
+        run: pnpm exec vp test --passWithNoTests
