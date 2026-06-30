@@ -2,12 +2,16 @@ import * as core from "@actions/core";
 
 import { upsertComment } from "./comment";
 import { ExperimentFailure, runEval } from "./braintrust";
-import { ExperimentSummary } from "braintrust";
-import { capitalize } from "@braintrust/core";
+import type { ExperimentSummary } from "braintrust";
 import { z } from "zod";
 
 const nodeManagers = ["npm", "pnpm"];
 const pythonManagers = ["pip", "uv"];
+const booleanInput = z.stringbool({ truthy: ["true"], falsy: ["false"] });
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 const paramsSchema = z
   .strictObject({
@@ -19,17 +23,8 @@ const paramsSchema = z
       .enum(["", ...nodeManagers, ...pythonManagers])
       .describe("The preferred package manager for the runtime selected")
       .default(""),
-    use_proxy: z
-      .string()
-      .toLowerCase()
-      .transform(x => JSON.parse(x))
-      .pipe(z.boolean()),
-    terminate_on_failure: z
-      .string()
-      .toLowerCase()
-      .transform(x => JSON.parse(x))
-      .pipe(z.boolean())
-      .default("false"),
+    use_proxy: booleanInput,
+    terminate_on_failure: booleanInput.default(false),
   })
   .refine(
     data => {
@@ -65,11 +60,11 @@ async function main(): Promise<void> {
     runtime: core.getInput("runtime"),
     package_manager: core.getInput("package_manager"),
     use_proxy: core.getInput("use_proxy"),
-    terminate_on_failure: core.getInput("terminate_on_failure"),
+    terminate_on_failure: core.getInput("terminate_on_failure") || undefined,
   });
   if (!args.success) {
     throw new Error(
-      `Invalid arguments: ${args.error.errors.map(e => e.message).join("\n")}`,
+      `Invalid arguments: ${args.error.issues.map(e => e.message).join("\n")}`,
     );
   }
 
