@@ -5,8 +5,7 @@
     "target": "ES2018",
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
-    "baseUrl": "."
+    "moduleResolution": "node"
   },
   "include": ["."],
   "exclude": ["node_modules/**", "**/dist/**"]
