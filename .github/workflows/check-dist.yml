@@ -54,12 +54,10 @@ jobs:
       - name: Install Dependencies
         id: install
         run: pnpm install
-        working-directory: eval
 
       - name: Build dist/ Directory
         id: build
-        run: pnpm build
-        working-directory: eval
+        run: pnpm exec vp run build
 
       # This will fail the workflow if the `dist/` directory is different than
       # expected.
