@@ -1,4 +1,4 @@
 [tools]
 nodejs = "24.15.0"
 pnpm = "10.33.0"
-python = "latest"
+python = "3.14"
