@@ -39,7 +39,7 @@
   "dependencies": {
     "@actions/core": "^3.0.1",
     "@actions/github": "^9.1.1",
-    "braintrust": "^3.20.0",
+    "braintrust": "^3.21.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
