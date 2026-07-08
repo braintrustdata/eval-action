@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "autoevals": "^0.0.131",
+    "autoevals": "^0.3.0",
     "braintrust": "^3.21.0"
   },
   "devDependencies": {
