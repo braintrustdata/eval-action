@@ -9,6 +9,6 @@
   },
   "devDependencies": {
     "turbo": "^2.10.3",
-    "vite-plus": "^0.2.1"
+    "vite-plus": "^0.2.4"
   }
 }
