@@ -35,7 +35,8 @@ jobs:
           runtime: node
 ```
 
-> [!IMPORTANT] You must specify `permissions` for the action to leave comments
+> [!IMPORTANT]
+> You must specify `permissions` for the action to leave comments
 > on your PR. Without these permissions, you'll see GitHub API errors.
 
 ## Inputs
