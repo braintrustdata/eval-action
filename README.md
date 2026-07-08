@@ -35,8 +35,9 @@ jobs:
           runtime: node
 ```
 
-> [!IMPORTANT]
-> You must specify `permissions` for the action to leave comments
+<!-- oxfmt-ignore -->
+
+> [!IMPORTANT] You must specify `permissions` for the action to leave comments
 > on your PR. Without these permissions, you'll see GitHub API errors.
 
 ## Inputs
