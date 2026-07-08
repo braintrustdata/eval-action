@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "autoevals": "^0.0.131",
-    "braintrust": "^0.0.124"
+    "braintrust": "^3.21.0"
   },
   "devDependencies": {
     "@types/node": "^26.1.0"
