@@ -112,7 +112,8 @@ fmt.Println(string(b))
 
 For Node and Python, the action runs `braintrust eval`. For Go, the action runs
 `go run` on `paths` from `root`. It collects experiment results emitted as JSONL
-and posts them as a comment in the PR alongside a link to Braintrust. For example:
+and posts them as a comment in the PR alongside a link to Braintrust. For
+example:
 
 ### Example braintrust eval report
 
