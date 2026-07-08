@@ -16,7 +16,12 @@ export default defineConfig({
     htmlWhitespaceSensitivity: "css",
     endOfLine: "lf",
     sortPackageJson: false,
-    ignorePatterns: ["**/dist/", "**/node_modules/", "**/coverage/"],
+    ignorePatterns: [
+      "**/dist/",
+      "**/node_modules/",
+      "**/coverage/",
+      "README.md",
+    ],
   },
   lint: {
     ignorePatterns: ["**/dist/**", "**/node_modules/**", "**/coverage/**"],
