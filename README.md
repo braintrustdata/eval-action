@@ -1,34 +1,55 @@
-# Braintrust eval action
+# Braintrust Eval Action
 
-This project enables you to run [Braintrust evals](braintrust.dev) as part of
-your CI/CD workflow in Github, using
-[Github actions](https://github.com/features/actions). To use this action,
-simply include the following step in an action file:
+Run [Braintrust evals](https://www.braintrust.dev) in GitHub Actions and post a
+live summary comment on the associated pull request.
+
+## Quick start
 
 ```yaml
-- name: Run Evals
-  uses: braintrustdata/eval-action@v1
-  with:
-    api_key: ${{ secrets.BRAINTRUST_API_KEY }}
-    runtime: node
+name: Braintrust evals
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run evals
+        uses: braintrustdata/eval-action@v2
+        with:
+          api_key: ${{ secrets.BRAINTRUST_API_KEY }}
+          runtime: node
 ```
 
-You can configure the following variables:
+> [!IMPORTANT] You must specify `permissions` for the action to leave comments
+> on your PR. Without these permissions, you'll see GitHub API errors.
 
-- `api_key`: Your
-  [Braintrust API key](https://www.braintrust.dev/app/settings/api-keys).
-- `root`: The root directory containing your evals (defaults to `'.'`). The root
-  directory must have `node`, `python`, or `go` configured.
-- `paths`: Specific paths, relative to the root, containing evals you'd like to
-  run.
-- `runtime`: Either `node`, `python`, or `go`
-- `package_manager`: Either `npm` or `pnpm` for a `node` runtime, `pip` or `uv`
-  for a `python` runtime, or `go` for a `go` runtime. You can omit this for Go.
-- `use_proxy`: Either `true` or `false`. If set, `OPENAI_BASE_URL` will be set
-  to `https://braintrustproxy.com/v1`, which will automatically cache repetitive
-  LLM calls and run your evals faster. Defaults to `true`.
-- `terminate_on_failure`: Either `true` or `false`. If set to `true`, the
-  evaluation process will stop when an error occurs. Defaults to `false`.
+## Inputs
+
+| Input                  | Required | Description                                                                                                                                                 |
+| ---------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api_key`              | Yes      | Your [Braintrust API key](https://www.braintrust.dev/app/settings/api-keys).                                                                                |
+| `runtime`              | Yes      | The runtime to use: `node`, `python`, or `go`.                                                                                                              |
+| `root`                 | No       | Root directory containing your evals. Defaults to `.`.                                                                                                      |
+| `paths`                | No       | Paths or glob patterns, relative to `root`, containing evals to run. Defaults to `.`.                                                                       |
+| `package_manager`      | No       | `npm` or `pnpm` for Node; `pip` or `uv` for Python; `go` for Go. Can be omitted for the default package manager.                                            |
+| `use_proxy`            | No       | Set to `true` to use the Braintrust proxy at `https://braintrustproxy.com/v1`, which can cache repetitive LLM calls and speed up evals. Defaults to `true`. |
+| `terminate_on_failure` | No       | Set to `true` to stop the eval process when an error occurs. Defaults to `false`. Ignored for Go evals.                                                     |
+| `github_token`         | No       | GitHub token used to create or update PR comments. Defaults to `${{ github.token }}`.                                                                       |
 
 ## Full example
 
@@ -36,14 +57,15 @@ You can configure the following variables:
 name: Run pnpm evals
 
 on:
+  pull_request:
   push:
-    # Uncomment to run only when files in the 'evals' directory change
-    # - paths:
-    #     - "evals/**"
+    # Uncomment to run only when files in the 'evals' directory change.
+    # paths:
+    #   - "evals/**"
 
 permissions:
-  pull-requests: write
   contents: read
+  pull-requests: write
 
 jobs:
   eval:
@@ -52,37 +74,33 @@ jobs:
 
     steps:
       - name: Checkout
-        id: checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        id: setup-node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - uses: pnpm/action-setup@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 10
 
-      - name: Install Dependencies
-        id: install
-        run: pnpm install
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Run Evals
-        uses: braintrustdata/eval-action@v1
+      - name: Run evals
+        uses: braintrustdata/eval-action@v2
         with:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           runtime: node
+          package_manager: pnpm
           root: my_eval_dir
 ```
 
-> [!IMPORTANT] You must specify `permissions` for the action to leave comments
-> on your PR. Without these permissions, you'll see Github API errors.
-
-To see examples of fully configured templates, see the `examples` directory:
+For more fully configured workflows, see the `examples` directory:
 
 - [`node with npm`](examples/node/npm.yml)
 - [`node with pnpm`](examples/node/pnpm.yml)
@@ -90,36 +108,34 @@ To see examples of fully configured templates, see the `examples` directory:
 - [`python with uv`](examples/python/uv.yml)
 - [`go`](examples/go/go.yml)
 
-## Go evals
+## Runtime behavior
 
-The Go runtime executes `go run ${paths}`. To include Go eval results in the PR
-comment, print each `ExperimentSummary` as one JSON line after calling
-`result.Summarize(ctx)`:
+- **Node and Python:** the action runs `braintrust eval --jsonl` from `root` and
+  collects the emitted experiment summaries.
+- **Go:** the action runs `go run ${paths}` from `root`. To include Go eval
+  results in the PR comment, print each `ExperimentSummary` as one JSON line
+  after calling `result.Summarize(ctx)`:
 
-```go
-summary, err := result.Summarize(ctx)
-if err != nil {
-    log.Fatal(err)
-}
-b, err := json.Marshal(summary)
-if err != nil {
-    log.Fatal(err)
-}
-fmt.Println(string(b))
-```
+  ```go
+  summary, err := result.Summarize(ctx)
+  if err != nil {
+      log.Fatal(err)
+  }
+  b, err := json.Marshal(summary)
+  if err != nil {
+      log.Fatal(err)
+  }
+  fmt.Println(string(b))
+  ```
 
-## How it works
+The action creates or updates a single PR comment with a Braintrust link and
+result table. For example:
 
-For Node and Python, the action runs `braintrust eval`. For Go, the action runs
-`go run` on `paths` from `root`. It collects experiment results emitted as JSONL
-and posts them as a comment in the PR alongside a link to Braintrust. For
-example:
-
-### Example braintrust eval report
+### Example Braintrust eval report
 
 **[Say Hi Bot (HEAD-1714341466)](https://www.braintrustdata.com/app/braintrustdata.com/p/Say%20Hi%20Bot/experiments/HEAD-1714341466)**
 
-| Score       | Average     | Improvements | Regressions |
-| ----------- | ----------- | -----------: | ----------: |
-| Levenshtein | 0.83 (+3pp) |         8 🟢 |        4 🔴 |
-| Duration    | 1s (0s)     |        16 🟢 |        1 🔴 |
+| Score       | Average    | Improvements | Regressions |
+| ----------- | ---------- | -----------: | ----------: |
+| Levenshtein | 83% (+3pp) |         8 🟢 |        4 🔴 |
+| Duration    | 1s (0s)    |        16 🟢 |        1 🔴 |
