@@ -18,12 +18,12 @@ You can configure the following variables:
 - `api_key`: Your
   [Braintrust API key](https://www.braintrust.dev/app/settings/api-keys).
 - `root`: The root directory containing your evals (defaults to `'.'`). The root
-  directory must either have `node` or `python` configured.
+  directory must have `node`, `python`, or `go` configured.
 - `paths`: Specific paths, relative to the root, containing evals you'd like to
   run.
-- `runtime`: Either `node` or `python`
-- `package_manager`: Either `npm`, `pnpm`, or `yarn` for a `node` runtime, or
-  `pip` or `uv` for a `python` runtime.
+- `runtime`: Either `node`, `python`, or `go`
+- `package_manager`: Either `npm` or `pnpm` for a `node` runtime, `pip` or `uv`
+  for a `python` runtime, or `go` for a `go` runtime. You can omit this for Go.
 - `use_proxy`: Either `true` or `false`. If set, `OPENAI_BASE_URL` will be set
   to `https://braintrustproxy.com/v1`, which will automatically cache repetitive
   LLM calls and run your evals faster. Defaults to `true`.
@@ -88,11 +88,31 @@ To see examples of fully configured templates, see the `examples` directory:
 - [`node with pnpm`](examples/node/pnpm.yml)
 - [`python with pip`](examples/python/pip.yml)
 - [`python with uv`](examples/python/uv.yml)
+- [`go`](examples/go/go.yml)
+
+## Go evals
+
+The Go runtime executes `go run ${paths}`. To include Go eval results in the PR
+comment, print each `ExperimentSummary` as one JSON line after calling
+`result.Summarize(ctx)`:
+
+```go
+summary, err := result.Summarize(ctx)
+if err != nil {
+    log.Fatal(err)
+}
+b, err := json.Marshal(summary)
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(string(b))
+```
 
 ## How it works
 
-The action runs `braintrust eval` and collects experiment results, which are
-posted as a comment in the PR alongside a link to Braintrust. For example:
+For Node and Python, the action runs `braintrust eval`. For Go, the action runs
+`go run` on `paths` from `root`. It collects experiment results emitted as JSONL
+and posts them as a comment in the PR alongside a link to Braintrust. For example:
 
 ### Example braintrust eval report
 

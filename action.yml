@@ -21,12 +21,12 @@ inputs:
     required: false
     default: "."
   runtime:
-    description: "The runtime to use for evals. Valid values: node, python."
+    description: "The runtime to use for evals. Valid values: node, python, go."
     required: true
   package_manager:
     description:
-      "The package manager to use for evals. Valid values: npm, pnpm, yarn, pip,
-      or uv depending on the runtime."
+      "The package manager to use for evals. Valid values: npm or pnpm for node,
+      pip or uv for python, or go for Go."
     required: false
     default: ""
   use_proxy:

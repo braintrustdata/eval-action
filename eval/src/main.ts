@@ -7,6 +7,7 @@ import { z } from "zod";
 
 const nodeManagers = ["npm", "pnpm"];
 const pythonManagers = ["pip", "uv"];
+const goManagers = ["go"];
 const booleanInput = z.stringbool({ truthy: ["true"], falsy: ["false"] });
 
 function capitalize(value: string) {
@@ -18,9 +19,9 @@ const paramsSchema = z
     api_key: z.string(),
     root: z.string(),
     paths: z.string(),
-    runtime: z.enum(["node", "python"]),
+    runtime: z.enum(["node", "python", "go"]),
     package_manager: z
-      .enum(["", ...nodeManagers, ...pythonManagers])
+      .enum(["", ...nodeManagers, ...pythonManagers, ...goManagers])
       .describe("The preferred package manager for the runtime selected")
       .default(""),
     use_proxy: booleanInput,
@@ -36,6 +37,9 @@ const paramsSchema = z
       }
       if (data.runtime === "python") {
         return pythonManagers.includes(data.package_manager as any);
+      }
+      if (data.runtime === "go") {
+        return goManagers.includes(data.package_manager as any);
       }
       return false;
     },
@@ -157,7 +161,7 @@ function formatSummary(summary: ExperimentSummary) {
     .map((_, idx) => (idx > 1 ? "---:" : ":---"))
     .join(" | ");
 
-  const rowData = Object.entries(summary.scores)
+  const rowData = Object.entries(summary.scores ?? {})
     .map(([name, scoreSummary]) => {
       let diffText = "";
       if (scoreSummary.diff !== undefined) {
