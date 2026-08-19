@@ -50,6 +50,8 @@ jobs:
 | `package_manager`      | No       | `npm` or `pnpm` for Node; `pip` or `uv` for Python; `go` for Go. Can be omitted for the default package manager.                                            |
 | `use_proxy`            | No       | Set to `true` to use the Braintrust proxy at `https://braintrustproxy.com/v1`, which can cache repetitive LLM calls and speed up evals. Defaults to `true`. |
 | `terminate_on_failure` | No       | Set to `true` to stop the eval process when an error occurs. Defaults to `false`. Ignored for Go evals.                                                     |
+| `report_scores`        | No       | Comma- or newline-separated score names to include in the PR comment. Defaults to all available scores.                                                     |
+| `report_metrics`       | No       | Comma- or newline-separated metric names to include in the PR comment. Defaults to all available metrics.                                                  |
 | `github_token`         | No       | GitHub token used to create or update PR comments. Defaults to `${{ github.token }}`.                                                                       |
 
 ## Full example
@@ -130,7 +132,23 @@ For more fully configured workflows, see the `examples` directory:
   ```
 
 The action creates or updates a single PR comment with a Braintrust link and
-result table. For example:
+separate score and metric tables. To show only selected results, set
+`report_scores` and `report_metrics` to their exact names:
+
+```yaml
+- uses: braintrustdata/eval-action@v2
+  with:
+    api_key: ${{ secrets.BRAINTRUST_API_KEY }}
+    runtime: node
+    report_scores: Levenshtein, Factuality
+    report_metrics: |
+      Duration
+      Cost
+```
+
+Each input accepts comma- or newline-separated names and filters its category
+independently. When an input is omitted or empty, all results in that category
+are included. For example:
 
 ### Example Braintrust eval report
 
@@ -139,4 +157,7 @@ result table. For example:
 | Score       | Average    | Improvements | Regressions |
 | ----------- | ---------- | -----------: | ----------: |
 | Levenshtein | 83% (+3pp) |         8 🟢 |        4 🔴 |
-| Duration    | 1s (0s)    |        16 🟢 |        1 🔴 |
+
+| Metric   | Average | Improvements | Regressions |
+| -------- | ------- | -----------: | ----------: |
+| Duration | 1s (0s) |        16 🟢 |        1 🔴 |
