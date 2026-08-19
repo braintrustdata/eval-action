@@ -241,28 +241,37 @@ export function formatSummary(
       };
     });
 
-  const tables = [
-    formatResultTable("Score", scoreRows),
-    formatResultTable("Metric", metricRows),
-  ].filter(Boolean);
-
-  return tables.length > 0 ? `${text}\n\n${tables.join("\n\n")}` : text;
+  const table = formatResultsTable(scoreRows, metricRows);
+  return table ? `${text}\n\n${table}` : text;
 }
 
-function formatResultTable(
-  resultType: "Score" | "Metric",
+function formatResultsTable(scoreRows: ReportRow[], metricRows: ReportRow[]) {
+  if (scoreRows.length === 0 && metricRows.length === 0) {
+    return "";
+  }
+
+  const columns = ["Name", "Average", "Improvements", "Regressions"];
+  const header = columns.join(" | ");
+  // Right align the Improvements and Regressions column cells
+  const separator = columns
+    .map((_, idx) => (idx > 1 ? "---:" : ":---"))
+    .join(" | ");
+  const sections = [
+    formatResultSection("Scores", scoreRows),
+    formatResultSection("Metrics", metricRows),
+  ].filter(Boolean);
+
+  return `${header}\n${separator}\n${sections.join("\n")}`;
+}
+
+function formatResultSection(
+  title: "Scores" | "Metrics",
   rowData: ReportRow[],
 ) {
   if (rowData.length === 0) {
     return "";
   }
 
-  const columns = [resultType, "Average", "Improvements", "Regressions"];
-  const header = columns.join(" | ");
-  // Right align the Improvements and Regressions column cells
-  const separator = columns
-    .map((_, idx) => (idx > 1 ? "---:" : ":---"))
-    .join(" | ");
   const rows = rowData.map(
     ({ name, avg, improvements, regressions }) =>
       `${capitalize(name)} | ${avg} | ${
@@ -274,7 +283,7 @@ function formatResultTable(
       }`,
   );
 
-  return `${header}\n${separator}\n${rows.join("\n")}`;
+  return `**${title}** | | |\n${rows.join("\n")}`;
 }
 
 function round(n: number, decimals: number) {

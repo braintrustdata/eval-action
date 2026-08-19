@@ -131,8 +131,8 @@ For more fully configured workflows, see the `examples` directory:
   fmt.Println(string(b))
   ```
 
-The action creates or updates a single PR comment with a Braintrust link and
-separate score and metric tables. To show only selected results, set
+The action creates or updates a single PR comment with a Braintrust link and a
+result table with score and metric sections. To show only selected results, set
 `report_scores` and `report_metrics` to their exact names:
 
 ```yaml
@@ -154,10 +154,9 @@ are included. For example:
 
 **[Say Hi Bot (HEAD-1714341466)](https://www.braintrustdata.com/app/braintrustdata.com/p/Say%20Hi%20Bot/experiments/HEAD-1714341466)**
 
-| Score       | Average    | Improvements | Regressions |
-| ----------- | ---------- | -----------: | ----------: |
-| Levenshtein | 83% (+3pp) |         8 🟢 |        4 🔴 |
-
-| Metric   | Average | Improvements | Regressions |
-| -------- | ------- | -----------: | ----------: |
-| Duration | 1s (0s) |        16 🟢 |        1 🔴 |
+| Name            | Average    | Improvements | Regressions |
+| --------------- | ---------- | -----------: | ----------: |
+| **Scores**      |            |              |             |
+| Levenshtein     | 83% (+3pp) |         8 🟢 |        4 🔴 |
+| **Metrics**     |            |              |             |
+| Duration        | 1s (0s)    |        16 🟢 |        1 🔴 |

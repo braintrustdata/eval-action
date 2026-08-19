@@ -54,16 +54,19 @@ describe("parseReportNames", () => {
 });
 
 describe("formatSummary", () => {
-  it("reports scores and metrics in separate tables by default", () => {
+  it("reports scores and metrics as sections in one table by default", () => {
     const result = formatSummary(summary);
 
-    expect(result).toContain("Score | Average | Improvements | Regressions");
+    expect(
+      result.match(/Name \| Average \| Improvements \| Regressions/g),
+    ).toHaveLength(1);
+    expect(result).toContain("**Scores** | | |");
     expect(result).toContain("Accuracy | 90% (+5pp)");
     expect(result).toContain("Completeness | 80%");
-    expect(result).toContain("Metric | Average | Improvements | Regressions");
+    expect(result).toContain("**Metrics** | | |");
     expect(result).toContain("Duration | 1.25s (-0.1s)");
     expect(result).toContain("Cost | 0.02$");
-    expect(result.indexOf("Metric | Average")).toBeGreaterThan(
+    expect(result.indexOf("**Metrics**")).toBeGreaterThan(
       result.indexOf("Completeness | 80%"),
     );
   });
