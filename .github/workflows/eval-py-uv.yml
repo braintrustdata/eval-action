@@ -1,9 +1,10 @@
 name: Run Python evals
 
 on:
+  pull_request:
   push:
-    # files:
-    #   - 'test-eval/**'
+    branches:
+      - main
 
 permissions:
   pull-requests: write

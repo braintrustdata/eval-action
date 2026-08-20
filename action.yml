@@ -41,6 +41,18 @@ inputs:
       'true' or 'false'."
     required: false
     default: "false"
+  report_scores:
+    description:
+      "A comma- or newline-separated list of score names to include in the PR
+      comment. By default, all scores are included."
+    required: false
+    default: ""
+  report_metrics:
+    description:
+      "A comma- or newline-separated list of metric names to include in the PR
+      comment. By default, all metrics are included."
+    required: false
+    default: ""
   github_token:
     description: "Your GitHub token"
     required: true

@@ -10,6 +10,17 @@ const pythonManagers = ["pip", "uv"];
 const goManagers = ["go"];
 const booleanInput = z.stringbool({ truthy: ["true"], falsy: ["false"] });
 
+export function parseReportNames(value: string) {
+  return [
+    ...new Set(
+      value
+        .split(/[\n,]/)
+        .map(name => name.trim())
+        .filter(Boolean),
+    ),
+  ];
+}
+
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
@@ -26,6 +37,8 @@ const paramsSchema = z
       .default(""),
     use_proxy: booleanInput,
     terminate_on_failure: booleanInput.default(false),
+    report_scores: z.string().transform(parseReportNames),
+    report_metrics: z.string().transform(parseReportNames),
   })
   .refine(
     data => {
@@ -65,6 +78,8 @@ async function main(): Promise<void> {
     package_manager: core.getInput("package_manager"),
     use_proxy: core.getInput("use_proxy"),
     terminate_on_failure: core.getInput("terminate_on_failure") || undefined,
+    report_scores: core.getInput("report_scores"),
+    report_metrics: core.getInput("report_metrics"),
   });
   if (!args.success) {
     throw new Error(
@@ -74,9 +89,14 @@ async function main(): Promise<void> {
 
   await upsertComment(`${TITLE}Evals in progress... ⌛`);
 
+  const reportFilters: ReportFilters = {
+    scores: args.data.report_scores,
+    metrics: args.data.report_metrics,
+  };
+
   try {
-    await runEval(args.data, onSummary);
-    await runUpdateComments(true);
+    await runEval(args.data, summaries => onSummary(summaries, reportFilters));
+    await runUpdateComments(true, reportFilters);
   } catch (error) {
     core.error(`Eval command failed: ${error}`);
     await upsertComment(`${TITLE}Evals failed: ${error}`);
@@ -86,20 +106,31 @@ async function main(): Promise<void> {
   }
 }
 
-const allSummaries: (ExperimentSummary | ExperimentFailure)[] = [];
-function onSummary(summary: (ExperimentSummary | ExperimentFailure)[]) {
-  allSummaries.push(...summary);
-  runUpdateComments(false);
+interface ReportFilters {
+  scores: string[];
+  metrics: string[];
 }
 
-async function runUpdateComments(mustRun: boolean) {
+const allSummaries: (ExperimentSummary | ExperimentFailure)[] = [];
+function onSummary(
+  summary: (ExperimentSummary | ExperimentFailure)[],
+  reportFilters: ReportFilters,
+) {
+  allSummaries.push(...summary);
+  runUpdateComments(false, reportFilters);
+}
+
+async function runUpdateComments(
+  mustRun: boolean,
+  reportFilters: ReportFilters,
+) {
   queuedUpdates += 1;
-  await updateComments(mustRun);
+  await updateComments(mustRun, reportFilters);
 }
 
 let queuedUpdates = 0;
 let currentUpdate: Promise<void> = Promise.resolve();
-async function updateComments(mustRun: boolean) {
+async function updateComments(mustRun: boolean, reportFilters: ReportFilters) {
   if (queuedUpdates > 1 && !mustRun) {
     return;
   }
@@ -121,6 +152,7 @@ async function updateComments(mustRun: boolean) {
             ) {
               prefix += formatSummary(
                 allSummaries[idx + 1] as ExperimentSummary,
+                reportFilters,
               );
             } else {
               prefix += `**${summary.evaluatorName} failed to run**`;
@@ -137,7 +169,7 @@ ${errors}
 </details>`
             );
           }
-          return formatSummary(summary);
+          return formatSummary(summary, reportFilters);
         },
       );
       const comment =
@@ -152,16 +184,25 @@ ${errors}
   await currentUpdate;
 }
 
-function formatSummary(summary: ExperimentSummary) {
-  const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
-  const columns = ["Score", "Average", "Improvements", "Regressions"];
-  const header = columns.join(" | ");
-  // Right align the Improvements and Regressions column cells
-  const separator = columns
-    .map((_, idx) => (idx > 1 ? "---:" : ":---"))
-    .join(" | ");
+interface ReportRow {
+  name: string;
+  avg: string;
+  improvements?: number;
+  regressions?: number;
+}
 
-  const rowData = Object.entries(summary.scores ?? {})
+export function formatSummary(
+  summary: ExperimentSummary,
+  reportFilters: Partial<ReportFilters> = {},
+) {
+  const text = `**[${summary.projectName} (${summary.experimentName})](${summary.experimentUrl})**`;
+  const reportScores = reportFilters.scores ?? [];
+  const reportMetrics = reportFilters.metrics ?? [];
+
+  const scoreRows = Object.entries(summary.scores ?? {})
+    .filter(
+      ([name]) => reportScores.length === 0 || reportScores.includes(name),
+    )
     .map(([name, scoreSummary]) => {
       let diffText = "";
       if (scoreSummary.diff !== undefined) {
@@ -176,29 +217,59 @@ function formatSummary(summary: ExperimentSummary) {
         improvements: scoreSummary.improvements,
         regressions: scoreSummary.regressions,
       };
-    })
-    .concat(
-      Object.entries(summary.metrics ?? {}).map(([name, metricSummary]) => {
-        let diffText = "";
-        if (metricSummary.diff !== undefined) {
-          const diffN = round(metricSummary.diff, 2);
-          diffText =
-            " " +
-            (metricSummary.diff >= 0
-              ? `(+${diffN}${metricSummary.unit})`
-              : `(${diffN}${metricSummary.unit})`);
-        }
-        return {
-          name,
-          avg: `${round(metricSummary.metric, 2)}${metricSummary.unit}${diffText}`,
-          improvements: metricSummary.improvements,
-          regressions: metricSummary.regressions,
-        };
-      }),
-    );
+    });
 
+  const metricRows = Object.entries(summary.metrics ?? {})
+    .filter(
+      ([name]) => reportMetrics.length === 0 || reportMetrics.includes(name),
+    )
+    .map(([name, metricSummary]) => {
+      let diffText = "";
+      if (metricSummary.diff !== undefined) {
+        const diffN = round(metricSummary.diff, 2);
+        diffText =
+          " " +
+          (metricSummary.diff >= 0
+            ? `(+${diffN}${metricSummary.unit})`
+            : `(${diffN}${metricSummary.unit})`);
+      }
+      return {
+        name,
+        avg: `${round(metricSummary.metric, 2)}${metricSummary.unit}${diffText}`,
+        improvements: metricSummary.improvements,
+        regressions: metricSummary.regressions,
+      };
+    });
+
+  const table = formatResultsTable(scoreRows, metricRows);
+  return table ? `${text}\n\n${table}` : text;
+}
+
+function formatResultsTable(scoreRows: ReportRow[], metricRows: ReportRow[]) {
+  if (scoreRows.length === 0 && metricRows.length === 0) {
+    return "";
+  }
+
+  const columns = ["Name", "Average", "Improvements", "Regressions"];
+  const header = columns.join(" | ");
+  // Right align the Improvements and Regressions column cells
+  const separator = columns
+    .map((_, idx) => (idx > 1 ? "---:" : ":---"))
+    .join(" | ");
+  const sections = [
+    formatResultSection("Scores", scoreRows),
+    formatResultSection("Metrics", metricRows),
+  ].filter(Boolean);
+
+  return `${header}\n${separator}\n${sections.join("\n")}`;
+}
+
+function formatResultSection(
+  title: "Scores" | "Metrics",
+  rowData: ReportRow[],
+) {
   if (rowData.length === 0) {
-    return text;
+    return "";
   }
 
   const rows = rowData.map(
@@ -211,7 +282,8 @@ function formatSummary(summary: ExperimentSummary) {
         regressions !== undefined && regressions > 0 ? `${regressions} 🔴` : `-`
       }`,
   );
-  return `${text}\n${header}\n${separator}\n${rows.join("\n")}`;
+
+  return `**${title}** | | |\n${rows.join("\n")}`;
 }
 
 function round(n: number, decimals: number) {
