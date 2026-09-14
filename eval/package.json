@@ -40,7 +40,7 @@
     "@actions/core": "^3.0.1",
     "@actions/github": "^9.1.1",
     "braintrust": "^3.21.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.2"
   },
   "devDependencies": {
     "@types/node": "^26.1.0",
