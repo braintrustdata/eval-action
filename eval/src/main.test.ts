@@ -1,7 +1,7 @@
 import type { ExperimentSummary } from "braintrust";
 import { describe, expect, it } from "vite-plus/test";
 
-import { formatSummary, parseReportNames } from "./main";
+import { formatSummary, paramsSchema, parseReportNames } from "./main";
 
 const summary: ExperimentSummary = {
   projectName: "Document processing",
@@ -53,6 +53,44 @@ describe("parseReportNames", () => {
   });
 });
 
+describe("runtime validation", () => {
+  const inputs = {
+    api_key: "test-key",
+    root: ".",
+    paths: "evals/run.rb",
+    use_proxy: "false",
+    terminate_on_failure: "false",
+    report_scores: "",
+    report_metrics: "",
+  };
+
+  it.each(["", "bundler"])(
+    "accepts Ruby with package manager %j",
+    package_manager => {
+      expect(
+        paramsSchema.safeParse({
+          ...inputs,
+          runtime: "ruby",
+          package_manager,
+        }).success,
+      ).toBe(true);
+    },
+  );
+
+  it.each(["npm", "pnpm", "pip", "uv", "go"])(
+    "rejects %s for Ruby",
+    package_manager => {
+      expect(
+        paramsSchema.safeParse({
+          ...inputs,
+          runtime: "ruby",
+          package_manager,
+        }).success,
+      ).toBe(false);
+    },
+  );
+});
+
 describe("formatSummary", () => {
   it("reports scores and metrics as sections in one table by default", () => {
     const result = formatSummary(summary);
@@ -100,5 +138,17 @@ describe("formatSummary", () => {
     ).toBe(
       "**[Document processing (pull-request-123)](https://example.com/experiment)**",
     );
+  });
+
+  it("renders summaries without numeric scores", () => {
+    expect(
+      formatSummary({
+        projectName: "Classifiers",
+        experimentName: "ci",
+        experimentUrl: "https://example.com/classifiers",
+        scores: {},
+        metrics: {},
+      }),
+    ).toBe("**[Classifiers (ci)](https://example.com/classifiers)**");
   });
 });

@@ -17,16 +17,19 @@ inputs:
     required: false
     default: "."
   paths:
-    description: "A list of paths (and glob patterns) to include in the evals"
+    description:
+      "Paths or glob patterns to include in the evals. For Ruby, this must be
+      one entrypoint file."
     required: false
     default: "."
   runtime:
-    description: "The runtime to use for evals. Valid values: node, python, go."
+    description:
+      "The runtime to use for evals. Valid values: node, python, go, ruby."
     required: true
   package_manager:
     description:
       "The package manager to use for evals. Valid values: npm or pnpm for node,
-      pip or uv for python, or go for Go."
+      pip or uv for python, go for Go, or bundler for Ruby."
     required: false
     default: ""
   use_proxy:
