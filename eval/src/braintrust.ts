@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs";
 import * as core from "@actions/core";
 import { spawn } from "child_process";
 
@@ -79,10 +80,24 @@ function parseSummaryLine(line: string) {
   }
 }
 
-async function runCommand(command: string, onSummary: OnSummaryFn) {
-  core.info(`> $ ${command}`);
+interface RubyCommand {
+  command: string;
+  args: string[];
+}
+
+async function runCommand(
+  command: string,
+  onSummary: OnSummaryFn,
+  args?: string[],
+) {
+  const display = args
+    ? [command, ...args.map(arg => JSON.stringify(arg))].join(" ")
+    : command;
+  core.info(`> $ ${display}`);
   return new Promise((resolve, reject) => {
-    const process = spawn(command, { shell: true });
+    const process = args
+      ? spawn(command, args)
+      : spawn(command, { shell: true });
     let stdoutBuffer = "";
 
     const handleStdoutLine = (line: string) => {
@@ -107,6 +122,16 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
       core.info(data.toString()); // Outputs the stderr of the command
     });
 
+    process.on("error", error => {
+      const hint =
+        command === "bundle"
+          ? " Ensure Bundler is installed and available on PATH."
+          : command === "ruby"
+            ? " Ensure Ruby is installed and available on PATH."
+            : "";
+      reject(new Error(`Failed to start ${command}: ${error.message}.${hint}`));
+    });
+
     process.on("close", code => {
       if (stdoutBuffer.length > 0) {
         handleStdoutLine(stdoutBuffer);
@@ -122,6 +147,46 @@ async function runCommand(command: string, onSummary: OnSummaryFn) {
   });
 }
 
+function validateRubyEntrypoint(root: string, entrypoint: string) {
+  if (entrypoint.trim() === "" || entrypoint === ".") {
+    throw new Error(
+      "Ruby evals require paths to name one entrypoint file (for example, evals/run.rb)",
+    );
+  }
+
+  const resolved = path.resolve(root, entrypoint);
+  let stat: fs.Stats;
+  try {
+    stat = fs.statSync(resolved);
+  } catch {
+    throw new Error(`Ruby eval entrypoint does not exist: ${entrypoint}`);
+  }
+  if (!stat.isFile()) {
+    throw new Error(`Ruby eval entrypoint is not a file: ${entrypoint}`);
+  }
+}
+
+export function buildRubyCommand(args: Params): RubyCommand {
+  validateRubyEntrypoint(args.root, args.paths);
+  if (args.terminate_on_failure) {
+    core.info("Ignoring terminate_on_failure for Ruby evals");
+  }
+  switch ((args.package_manager || "").toLowerCase().trim()) {
+    case "":
+      return {
+        command: "ruby",
+        args: [args.paths],
+      };
+    case "bundler":
+      return {
+        command: "bundle",
+        args: ["exec", "ruby", args.paths],
+      };
+    default:
+      throw new Error(`Unsupported package manager: ${args.package_manager}`);
+  }
+}
+
 export async function runEval(args: Params, onSummary: OnSummaryFn) {
   const { api_key, root, paths, terminate_on_failure } = args;
 
@@ -135,6 +200,11 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
   if (args.use_proxy) {
     core.exportVariable("OPENAI_BASE_URL", "https://braintrustproxy.com/v1");
   }
+
+  const rubyCommand =
+    args.runtime.toLowerCase().trim() === "ruby"
+      ? buildRubyCommand(args)
+      : undefined;
 
   // Change working directory
   process.chdir(path.resolve(root));
@@ -188,10 +258,12 @@ export async function runEval(args: Params, onSummary: OnSummaryFn) {
               `Unsupported package manager: ${args.package_manager}`,
             );
         }
+      case "ruby":
+        return rubyCommand!.command;
       default:
         throw new Error(`Unsupported runtime: ${args.runtime}`);
     }
   })();
 
-  await runCommand(command, onSummary);
+  await runCommand(command, onSummary, rubyCommand?.args);
 }
