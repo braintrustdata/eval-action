@@ -88,6 +88,16 @@ class BraintrustReportTest < Minitest::Test
     refute records.last.key?("errors")
   end
 
+  def test_omits_nullable_comparison_diffs
+    summary = {"scores" => {"Accuracy" => {"score" => 1, "diff" => nil}},
+      "metrics" => {"Duration" => {"metric" => 1.2, "unit" => "s", "diff" => nil}}}
+    with_http([response(200, summary)]) do
+      normalized = BraintrustCI.fetch_summary(@result, @state)
+      refute normalized["scores"]["Accuracy"].key?("diff")
+      refute normalized["metrics"]["Duration"].key?("diff")
+    end
+  end
+
   def test_flush_and_output_failures_surface
     def @provider.force_flush(timeout:); 1; end
     Net::HTTP.stub(:start, ->(*) { flunk "must not query before a successful flush" }) do

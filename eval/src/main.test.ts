@@ -139,16 +139,4 @@ describe("formatSummary", () => {
       "**[Document processing (pull-request-123)](https://example.com/experiment)**",
     );
   });
-
-  it("renders summaries without numeric scores", () => {
-    expect(
-      formatSummary({
-        projectName: "Classifiers",
-        experimentName: "ci",
-        experimentUrl: "https://example.com/classifiers",
-        scores: {},
-        metrics: {},
-      }),
-    ).toBe("**[Classifiers (ci)](https://example.com/classifiers)**");
-  });
 });

@@ -46,7 +46,7 @@ module BraintrustCI
         summary = JSON.parse(response.body)
         expected = result.scorer_stats.keys.map(&:to_s)
         missing = expected - (summary["scores"] || {}).keys
-        return summary if missing.empty?
+        return normalize_summary(summary) if missing.empty?
         reason = "summary is missing scores: #{missing.join(', ')}"
       elsif [404, 429, 500, 502, 503, 504].include?(response.code.to_i)
         reason = "summary HTTP #{response.code}"
@@ -58,5 +58,14 @@ module BraintrustCI
       raise "Braintrust #{reason} after retries" if attempt == 7
       sleep [2**attempt, 8].min
     end
+  end
+
+  def self.normalize_summary(summary)
+    %w[scores metrics].each do |section|
+      (summary[section] || {}).each_value do |value|
+        value.delete("diff") if value["diff"].nil?
+      end
+    end
+    summary
   end
 end
