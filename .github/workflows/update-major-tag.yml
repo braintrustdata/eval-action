@@ -1,0 +1,56 @@
+name: Update major version tag
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+# Serialize updates, including releases published close together.
+concurrency:
+  group: update-major-version-tag
+  cancel-in-progress: false
+
+jobs:
+  update-major-tag:
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Update major tag to the latest stable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        shell: bash
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Skipping nonstandard release tag: $RELEASE_TAG"
+            exit 0
+          fi
+          major="${BASH_REMATCH[1]}"
+
+          # Select by version, not publication date, so backports and reruns
+          # cannot move the major tag back to an older release.
+          latest_tag=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq '.[] | select(.draft == false and .prerelease == false) | .tag_name' \
+            | jq -Rsr --arg major "$major" '
+                split("\n")
+                | map(select(test("^v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$")))
+                | map({tag: ., version: (ltrimstr("v") | split(".") | map(tonumber))})
+                | map(select(.version[0] == ($major | tonumber)))
+                | max_by(.version).tag // empty
+              ')
+          if [[ -z "$latest_tag" ]]; then
+            echo "No stable release found for v$major" >&2
+            exit 1
+          fi
+
+          git fetch origin "refs/tags/$latest_tag:refs/tags/$latest_tag"
+          commit=$(git rev-parse "refs/tags/$latest_tag^{commit}")
+          git tag --force "v$major" "$commit"
+          git push --force origin "refs/tags/v$major"
+          echo "Updated v$major to $latest_tag ($commit)" >> "$GITHUB_STEP_SUMMARY"
