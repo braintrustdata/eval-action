@@ -8,6 +8,7 @@ import { z } from "zod";
 const nodeManagers = ["npm", "pnpm"];
 const pythonManagers = ["pip", "uv"];
 const goManagers = ["go"];
+const rubyManagers = ["bundler"];
 const booleanInput = z.stringbool({ truthy: ["true"], falsy: ["false"] });
 
 export function parseReportNames(value: string) {
@@ -25,14 +26,20 @@ function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-const paramsSchema = z
+export const paramsSchema = z
   .strictObject({
     api_key: z.string(),
     root: z.string(),
     paths: z.string(),
-    runtime: z.enum(["node", "python", "go"]),
+    runtime: z.enum(["node", "python", "go", "ruby"]),
     package_manager: z
-      .enum(["", ...nodeManagers, ...pythonManagers, ...goManagers])
+      .enum([
+        "",
+        ...nodeManagers,
+        ...pythonManagers,
+        ...goManagers,
+        ...rubyManagers,
+      ])
       .describe("The preferred package manager for the runtime selected")
       .default(""),
     use_proxy: booleanInput,
@@ -53,6 +60,9 @@ const paramsSchema = z
       }
       if (data.runtime === "go") {
         return goManagers.includes(data.package_manager as any);
+      }
+      if (data.runtime === "ruby") {
+        return rubyManagers.includes(data.package_manager as any);
       }
       return false;
     },

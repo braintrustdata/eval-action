@@ -1,0 +1,45 @@
+name: Run Ruby evals
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  eval:
+    # Fork PRs do not receive the API secret or a write-capable token.
+    if:
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: examples/ruby
+
+      - name: Run evals
+        uses: braintrustdata/eval-action@v2
+        with:
+          api_key: ${{ secrets.BRAINTRUST_API_KEY }}
+          runtime: ruby
+          package_manager: bundler
+          root: examples/ruby
+          paths: evals/run.rb
+        env:
+          BRAINTRUST_PROJECT: ruby-ci-example
+          # Optional: set this to a stable main-branch experiment in this project.
+          BRAINTRUST_BASE_EXPERIMENT_ID:
+            ${{ vars.BRAINTRUST_BASE_EXPERIMENT_ID }}

@@ -1,7 +1,7 @@
 import type { ExperimentSummary } from "braintrust";
 import { describe, expect, it } from "vite-plus/test";
 
-import { formatSummary, parseReportNames } from "./main";
+import { formatSummary, paramsSchema, parseReportNames } from "./main";
 
 const summary: ExperimentSummary = {
   projectName: "Document processing",
@@ -51,6 +51,44 @@ describe("parseReportNames", () => {
   it("uses an empty list to report every result in a category", () => {
     expect(parseReportNames("  \n , ")).toEqual([]);
   });
+});
+
+describe("runtime validation", () => {
+  const inputs = {
+    api_key: "test-key",
+    root: ".",
+    paths: "evals/run.rb",
+    use_proxy: "false",
+    terminate_on_failure: "false",
+    report_scores: "",
+    report_metrics: "",
+  };
+
+  it.each(["", "bundler"])(
+    "accepts Ruby with package manager %j",
+    package_manager => {
+      expect(
+        paramsSchema.safeParse({
+          ...inputs,
+          runtime: "ruby",
+          package_manager,
+        }).success,
+      ).toBe(true);
+    },
+  );
+
+  it.each(["npm", "pnpm", "pip", "uv", "go"])(
+    "rejects %s for Ruby",
+    package_manager => {
+      expect(
+        paramsSchema.safeParse({
+          ...inputs,
+          runtime: "ruby",
+          package_manager,
+        }).success,
+      ).toBe(false);
+    },
+  );
 });
 
 describe("formatSummary", () => {
